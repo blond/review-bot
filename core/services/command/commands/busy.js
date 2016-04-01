@@ -1,5 +1,3 @@
-'use strict';
-
 import util from 'util';
 import { find, reject } from 'lodash';
 
@@ -39,30 +37,28 @@ export default function commandService(options, imports) {
     const login = payload.comment.user.login;
     const reviewer = find(pullRequest.review.reviewers, { login });
 
-    if (reviewer) {
-      return review.review(pullRequest.id)
-        .then(result => {
-          const candidate = result.team[0];
-          const reviewers = reject(
-            pullRequest.review.reviewers,
-            { login: payload.comment.user.login }
-          );
-
-          reviewers.push(candidate);
-
-          return action
-            .save({ reviewers }, pullRequest.id)
-            .then(pullRequest => {
-              events.emit(EVENT_NAME, { pullRequest });
-            });
-        });
-    } else {
+    if (!reviewer) {
       return Promise.reject(new Error(util.format(
         '%s tried to change reviewer, but he is not in reviewers list [%s – %s] %s',
         login, pullRequest.number, pullRequest.title, pullRequest.html_url
       )));
     }
 
+    return review.review(pullRequest.id)
+      .then(result => {
+        const candidate = result.team[0];
+        const reviewers = reject(
+          pullRequest.review.reviewers,
+          { login: payload.comment.user.login }
+        );
+
+        reviewers.push(candidate);
+
+        return action.updateReviewers(reviewers, pullRequest.id);
+      })
+      .then(pullRequest => {
+        events.emit(EVENT_NAME, { pullRequest });
+      });
   };
 
   return busyCommand;

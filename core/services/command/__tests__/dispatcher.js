@@ -1,5 +1,3 @@
-'use strict';
-
 import CommandDispatcher from '../dispatcher';
 
 describe('services/command/dispatcher', () => {

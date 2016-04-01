@@ -46,7 +46,7 @@
     "path": "./core/services/choose-reviewer-steps/steps/load",
     "options": { "max": 1 },
     "dependencies": [
-      "model"
+      "pull-request-model"
     ]
   },
 

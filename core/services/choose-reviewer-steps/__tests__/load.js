@@ -1,19 +1,18 @@
 import _ from 'lodash';
 
-import { mockMembers } from './mocks/index';
+import { mockMembers } from '../__mocks__/index';
 import service from '../steps/load';
 
 describe('services/choose-reviewer-steps/load', () => {
 
-  let members, pullRequest, pullRequestModel, model, find; // eslint-disable-line
+  let members, pullRequest, pullRequestModel, find; // eslint-disable-line
 
   beforeEach(() => {
     members = _.cloneDeep(mockMembers);
     pullRequest = {};
 
     find = sinon.stub();
-    pullRequestModel = { findOpenReviewsByUser: find };
-    model = { get: sinon.stub().returns(pullRequestModel) };
+    pullRequestModel = { findInReviewByReviewer: find };
   });
 
   it('should decrease rank if member has active reviews', done => {
@@ -54,7 +53,7 @@ describe('services/choose-reviewer-steps/load', () => {
     find.withArgs('Black Widow').returns(Promise.resolve([activePull1]));
     find.withArgs('Hulk').returns(Promise.resolve([activePull1, activePull2]));
 
-    const step = service({ max: 1 }, { model });
+    const step = service({ max: 1 }, { 'pull-request-model': pullRequestModel });
 
     step(review)
       .then(review => {
@@ -67,7 +66,7 @@ describe('services/choose-reviewer-steps/load', () => {
   it('should do nothing if there are no reviewers', done => {
     const review = { team: [], pullRequest };
 
-    const step = service({ max: 1 }, { model });
+    const step = service({ max: 1 }, { 'pull-request-model': pullRequestModel });
     step(review, {})
       .then(review => {
         assert.deepEqual(review.team, []);

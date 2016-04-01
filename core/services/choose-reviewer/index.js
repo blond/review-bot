@@ -1,31 +1,27 @@
-'use strict';
-
 import { isEmpty } from 'lodash';
 
-export class Review {
+export class ChooseReviewer {
 
   /**
    * @constructor
    *
    * @param {Object} payload
    */
-  constructor(payload) {
-    this.payload = payload;
-
-    this.team = payload.team;
-    this.steps = payload.steps;
-    this.logger = payload.logger;
-    this.pullRequestModel = payload.pullRequestModel;
+  constructor({ team, steps, logger, 'pull-request-model': pullRequestModel }) {
+    this.team = team;
+    this.steps = steps;
+    this.logger = logger;
+    this.pullRequestModel = pullRequestModel;
   }
 
   /**
-   * Get team for pull request.
+   * Get and then set team for pull request.
    *
    * @param {Review} review
    *
    * @return {Promise}
    */
-  findTeam(review) {
+  setTeam(review) {
     return this.team
       .findByPullRequest(review.pullRequest)
       .then(team => {
@@ -41,7 +37,7 @@ export class Review {
    *
    * @return {Promise}
    */
-  findSteps(review) {
+  setSteps(review) {
     return this.steps(review.pullRequest)
       .then(steps => {
         review.steps = steps;
@@ -93,9 +89,9 @@ export class Review {
   stepsQueue(review) {
     return review.steps.reduce((queue, ranker) => {
       return queue.then(review => {
-        this.logger.info('choose reviewer phase is `%s`', ranker.name);
+        this.logger.info('Choose reviewer phase is `%s`', ranker.name);
 
-        return ranker(review, this.payload);
+        return ranker(review);
       });
     }, Promise.resolve(review));
   }
@@ -109,12 +105,12 @@ export class Review {
    * @return {Promise}
    */
   review(pullId) {
-    this.logger.info('Review started');
+    this.logger.info('Review started for #%s', pullId);
 
     return this
       .start(pullId)
-      .then(::this.findSteps)
-      .then(::this.findTeam)
+      .then(::this.setTeam)
+      .then(::this.setSteps)
       .then(::this.addZeroRank)
       .then(::this.stepsQueue)
       .then(review => {
@@ -137,19 +133,10 @@ export class Review {
 
 }
 
-export default function (options, imports) {
+export default function setup(options, imports) {
+  const service = new ChooseReviewer(imports);
 
-  const { team, model, logger, steps } = imports;
-
-  const payload = {
-    steps,
-    team,
-    logger,
-    pullRequestModel: model.get('pull_request')
-  };
-
-  return new Review(payload);
-
+  return service;
 }
 
 /**

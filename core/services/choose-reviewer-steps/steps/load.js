@@ -16,14 +16,14 @@ export default function loadService(options, imports) {
   function load(review, payload) {
 
     const promise = [];
-    const pullRequestModel = imports.model.get('pull_request');
+    const pullRequestModel = imports['pull-request-model'];
 
     if (_.isEmpty(review.team)) {
       return Promise.resolve(review);
     }
 
     review.team.forEach(member => {
-      promise.push(pullRequestModel.findOpenReviewsByUser(member.login));
+      promise.push(pullRequestModel.findInReviewByReviewer(member.login));
     });
 
     return Promise

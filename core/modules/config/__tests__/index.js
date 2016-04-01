@@ -1,5 +1,3 @@
-'use strict';
-
 import proxyquire from 'proxyquire';
 
 describe('modules/config', function () {

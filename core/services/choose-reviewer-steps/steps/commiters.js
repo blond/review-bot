@@ -54,7 +54,7 @@ export function getCommits(github, pullRequest, since, commitsCount) {
 
     const options = {
       repo: pullRequest.repository.name,
-      user: pullRequest.organization.login,
+      user: pullRequest.repository.owner.login,
       per_page: commitsCount
     };
 
@@ -93,7 +93,7 @@ export function getCommiters(commits) {
 
     if (!author) return;
 
-    members[author.login] = members[author.login] + 1 || 1;
+    members[author.login] = (members[author.login] + 1) || 1;
   });
 
   return Promise.resolve(members);

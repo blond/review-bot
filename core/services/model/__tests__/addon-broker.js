@@ -1,5 +1,3 @@
-'use strict';
-
 import { AddonBroker } from '../addon-broker';
 
 describe('services/model/addon-broker', function () {
@@ -23,9 +21,9 @@ describe('services/model/addon-broker', function () {
 
       const addonBroker = new AddonBroker(null, { modelA: [extender] });
 
-      addonBroker.setupExtenders('modelA', baseSchema);
+      const schema = addonBroker.setupExtenders('modelA', baseSchema);
 
-      assert.deepEqual(baseSchema, { moduleA: { fieldA: Number, fieldB: String } });
+      assert.deepEqual(schema, { moduleA: { fieldA: Number, fieldB: String } });
     });
 
     it('should be able to add pre-save hook', function (done) {

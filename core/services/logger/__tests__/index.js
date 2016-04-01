@@ -11,7 +11,7 @@ class MyDummyWritableStream extends Writable {
 
 describe('services/logger', function () {
 
-  it('should be resolved to logger', function () {
+  it('should be resolved to Logger', function () {
 
     const options = {
       transports: []
@@ -19,6 +19,7 @@ describe('services/logger', function () {
 
     const logger = service(options);
 
+    assert.property(logger, 'log');
     assert.property(logger, 'info');
     assert.property(logger, 'warn');
     assert.property(logger, 'error');
@@ -43,22 +44,16 @@ describe('services/logger', function () {
       };
 
       service(options);
-
     });
 
-    it('should throw an error if unknown transport passed', function () {
+    it('should throw an error if unknown transport was given', function () {
       const options = {
-        transports: [{ name: 'black-hole' }]
+        transports: [{ name: 'blackhole' }]
       };
 
-      const run = function () {
-        return service(options);
-      };
-
-      assert.throws(run, /black\-hole/);
+      assert.throws(() => service(options), /blackhole/);
     });
 
   });
-
 
 });

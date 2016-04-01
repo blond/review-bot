@@ -1,5 +1,3 @@
-'use strict';
-
 import StaticTeam from '../static';
 
 describe('services/team-static/static', () => {
@@ -12,18 +10,6 @@ describe('services/team-static/static', () => {
       .then(result => {
         assert.notEqual(result, members);
         assert.deepEqual(result, members);
-        done();
-      })
-      .catch(done);
-  });
-
-  it('should return a team member with given login', done => {
-    const members = [{ login: 'a' }, { login: 'b' }];
-    const team = new StaticTeam(members);
-
-    team.getMember({}, 'b')
-      .then(result => {
-        assert.deepEqual(result, members[1]);
         done();
       })
       .catch(done);

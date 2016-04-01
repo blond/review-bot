@@ -1,8 +1,6 @@
-'use strict';
-
 import Jabber from './jabber';
 
-export default function (options, imports) {
+export default function setup(options, imports) {
 
   const logger = imports.logger;
   options.info = function (message) {

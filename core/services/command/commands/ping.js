@@ -1,5 +1,3 @@
-'use strict';
-
 import util from 'util';
 
 const EVENT_NAME = 'review:command:ping';

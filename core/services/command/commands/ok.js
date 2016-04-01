@@ -1,5 +1,3 @@
-'use strict';
-
 import util from 'util';
 import { find, cloneDeep } from 'lodash';
 
@@ -70,7 +68,7 @@ export default function commandService(options, imports) {
 
           reviewers.push(newReviewer);
 
-          return action.save({ reviewers }, pullRequest.id);
+          return action.updateReviewers(reviewers, pullRequest.id);
         })
         .then(pullRequest => action.approveReview(login, pullRequest.id))
         .then(pullRequest => {

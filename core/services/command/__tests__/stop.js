@@ -1,3 +1,5 @@
+import pullRequestActionMock from '../../pull-request-action/__mocks__/index';
+
 import service from '../commands/stop';
 
 describe('services/command/stop', () => {
@@ -15,11 +17,7 @@ describe('services/command/stop', () => {
 
     comment = { user: { login: 'd4rkr00t' } };
 
-    action = {
-      save: sinon.stub().returns(Promise.resolve(pullRequest)),
-
-      approveReview: sinon.stub().returns(Promise.resolve(pullRequest))
-    };
+    action = pullRequestActionMock(pullRequest);
 
     command = service({}, { action, team, events, logger });
 
@@ -28,21 +26,21 @@ describe('services/command/stop', () => {
 
   it('should be rejected if pr is closed', done => {
     payload.pullRequest.state = 'closed';
-    command('', payload).catch(() => done());
+    command('/stop', payload).catch(() => done());
   });
 
   it('should be rejected if triggered by not an author', done => {
     payload.comment.user.login = 'blablabla';
-    command('', payload).catch(() => done());
+    command('/stop', payload).catch(() => done());
   });
 
   it('should be rejected if pull request review not in progress', done => {
     payload.pullRequest.review.status = 'complete';
-    command('', payload).catch(() => done());
+    command('/stop', payload).catch(() => done());
   });
 
   it('should trigger review:command:stop event', done => {
-    command('', payload)
+    command('/stop', payload)
       .then(() => {
         assert.calledWith(events.emit, 'review:command:stop');
         done();

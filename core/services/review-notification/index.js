@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Notification service
  *
@@ -10,7 +8,7 @@
  *
  * @return {Promise}
  */
-export default function (options, imports) {
+export default function setup(options, imports) {
 
   const events = imports.events;
   const transport = imports[options.transport];

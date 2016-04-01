@@ -1,0 +1,26 @@
+{
+  "plugin-review-badges": {
+    "path": "./core/plugins/review-badges",
+    "options": {
+      "url": "http://localhost:8080/badges/",
+      "style": "flat"
+    },
+    "dependencies": [
+      "queue",
+      "events",
+      "logger",
+      "pull-request-model",
+      "pull-request-github"
+    ]
+  },
+
+  "plugin-review-autoassign": {
+    "path": "./core/plugins/review-autoassign",
+    "dependencies": [
+      "events",
+      "logger",
+      "choose-reviewer",
+      "pull-request-action"
+    ]
+  }
+}

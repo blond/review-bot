@@ -1,5 +1,3 @@
-'use strict';
-
 import _ from 'lodash';
 
 export default class StaticTeam {
@@ -13,6 +11,7 @@ export default class StaticTeam {
     if (!Array.isArray(members)) {
       throw new Error('Members should be an array');
     }
+
     if (members.length === 0) {
       throw new Error('Passed an empty array of members');
     }
@@ -22,11 +21,8 @@ export default class StaticTeam {
 
   getTeam() {
     const members = _.cloneDeep(this.members);
-    return Promise.resolve(members);
-  }
 
-  getMember(pullRequest, login) {
-    return Promise.resolve(_.find(this.members, { login }));
+    return Promise.resolve(members);
   }
 
 }

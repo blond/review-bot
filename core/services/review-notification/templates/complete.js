@@ -1,5 +1,3 @@
-'use strict';
-
 function message(payload) {
   const pullRequest = payload.pullRequest;
 

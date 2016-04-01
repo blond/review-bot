@@ -26,7 +26,7 @@
       "options": {
         "addons": {
           "pull_request": [
-            "./core/services/complexity/addon",
+            "./core/plugins/complexity/addon",
             "./core/services/pull-request-github/addon"
           ]
         }
@@ -55,17 +55,23 @@
         "port": "8080",
         "routes": {
           "/badges": "http-routes-badges",
-          "/github": "http-routes-github"
+          "/github": "http-routes-github",
+          "/favicon.ico": "http-routes-favicon"
         }
       },
       "dependencies": [
         "logger",
         "http-routes-badges",
-        "http-routes-github"
+        "http-routes-github",
+        "http-routes-favicon"
       ]
     },
 
     "#include:http-routes": "./default-http-routes.json",
+
+    "queue": {
+      "path": "./core/services/queue"
+    },
 
     "choose-team": {
       "path": "./core/services/choose-team",
@@ -86,10 +92,10 @@
       "path": "./core/services/choose-reviewer",
       "dependencies": {
         "team": "choose-team",
-        "model": "model",
         "logger": "logger",
         "events": "events",
-        "steps": "choose-reviewer-steps"
+        "steps": "choose-reviewer-steps",
+        "pull-request-model": "pull-request-model"
       }
     },
 
@@ -126,6 +132,13 @@
 
     "#include:choose-reviewer-steps": "./default-reviewer-steps.json",
 
+    "pull-request-model": {
+      "path": "./core/services/pull-request-model",
+      "dependencies": [
+        "model"
+      ]
+    },
+
     "pull-request-github": {
       "path": "./core/services/pull-request-github",
       "options": {
@@ -135,16 +148,9 @@
         }
       },
       "dependencies": [
-        "model",
         "logger",
-        "github"
-      ]
-    },
-
-    "pull-request-body-queue": {
-      "path": "./core/services/pull-request-body-section-queue",
-      "dependencies": [
-        "pull-request-github"
+        "github",
+        "pull-request-model"
       ]
     },
 
@@ -157,10 +163,10 @@
         }
       },
       "dependencies": [
-        "model",
         "events",
         "logger",
-        "choose-team"
+        "choose-team",
+        "pull-request-model"
       ]
     },
 
@@ -168,50 +174,13 @@
       "path": "./core/services/command",
       "options": {
         "events": ["github:issue_comment"],
-        "commands": [
-          {
-            "test": "\/start",
-            "handlers": ["command-start"]
-          },
-          {
-            "test": "\/stop",
-            "handlers": ["command-stop"]
-          },
-          {
-            "test": "\/?ping",
-            "handlers": ["command-ping"]
-          },
-          {
-            "test": "\/ok|\/ок|^ok|^ок",
-            "handlers": ["command-ok"]
-          },
-          {
-            "test": "\/?!ok|\/?!ок$$",
-            "handlers": ["command-not-ok"]
-          },
-          {
-            "test": "\/busy",
-            "handlers": ["command-busy"]
-          },
-          {
-            "test": "\/change",
-            "handlers": ["command-change"]
-          },
-          {
-            "test": "\/add|\\+@?[\\w]+",
-            "handlers": ["command-add"]
-          },
-          {
-            "test": "\/remove|\\-@?[\\w]+",
-            "handlers": ["command-remove"]
-          }
-        ]
+        "#include:command-regexp": "./default-command-regexp.json"
       },
       "dependencies": [
-        "model",
         "queue",
         "events",
         "logger",
+        "pull-request-model",
         "command-start",
         "command-stop",
         "command-ping",
@@ -224,11 +193,7 @@
       ]
     },
 
-    "#include:commands": "./default-commands.json",
-
-    "queue": {
-      "path": "./core/services/queue"
-    },
+    "#include:command": "./default-command.json",
 
     "jabber": {
       "path": "./core/services/jabber",
@@ -256,27 +221,7 @@
       ]
     },
 
-    "!plugin-review-badges": {
-      "path": "./core/services/review-badges",
-      "options": {
-        "url": "http://localhost:8080/badges/",
-        "style": "flat"
-      },
-      "dependencies": [
-        "events",
-        "pull-request-body-queue"
-      ]
-    },
-
-    "!plugin-review-autoassign": {
-      "path": "./core/services/review-autoassign",
-      "dependencies": [
-        "events",
-        "logger",
-        "choose-reviewer",
-        "pull-request-action"
-      ]
-    }
+    "#include:plugins": "./default-plugins.json"
 
   }
 }

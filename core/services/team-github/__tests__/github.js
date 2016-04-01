@@ -1,5 +1,3 @@
-'use strict';
-
 import GitHubTeam from '../github';
 
 describe('services/team-github/github', function () {
@@ -7,8 +5,10 @@ describe('services/team-github/github', function () {
   let github;
 
   const pull = {
-    organization: {
-      login: 'devexp-org'
+    repository: {
+      owner: {
+        login: 'devexp-org'
+      }
     }
   };
 
@@ -90,23 +90,6 @@ describe('services/team-github/github', function () {
       github.orgs.getTeamMembers.callArgWith(1, new Error('error'));
 
       teamPromise.catch(error => { done(); });
-    });
-
-  });
-
-  describe('getMember', function () {
-
-    it('should return a team member with given login', done => {
-      const members = [{ login: 'a' }, { login: 'b' }];
-      const gt = new GitHubTeam(members);
-      gt.getTeam = sinon.stub().returns(Promise.resolve(members));
-
-      gt.getMember({}, 'b')
-        .then(result => {
-          assert.deepEqual(result, members[1]);
-          done();
-        })
-        .catch(done);
     });
 
   });

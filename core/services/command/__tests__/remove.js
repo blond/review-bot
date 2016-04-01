@@ -4,7 +4,8 @@ import parseLogins from '../../parse-logins/parse-logins';
 
 import service from '../commands/remove';
 import { getParticipant } from '../commands/remove';
-import { mockReviewers } from './mocks';
+import { mockReviewers } from '../__mocks__/index';
+import pullRequestActionMock from '../../pull-request-action/__mocks__/index';
 
 describe('services/command/remove', () => {
 
@@ -51,7 +52,7 @@ describe('services/command/remove', () => {
     let command, pullRequest, payload, action, events, logger, comment; // eslint-disable-line
 
     beforeEach(() => {
-      action = { save: sinon.stub().returns(Promise.resolve(pullRequest)) };
+      action = pullRequestActionMock(pullRequest);
       events = { emit: sinon.stub() };
       logger = { info: sinon.stub() };
       comment = {
@@ -81,7 +82,7 @@ describe('services/command/remove', () => {
 
     it('should save pullRequest with new reviewers list', done => {
       command('/remove Hulk', payload).then(() => {
-        assert.called(action.save);
+        assert.called(action.updateReviewers);
         done();
       }, done);
     });

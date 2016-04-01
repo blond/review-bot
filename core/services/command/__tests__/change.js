@@ -4,7 +4,8 @@ import parseLogins from '../../parse-logins/parse-logins';
 
 import service from '../commands/change';
 import { getParticipant } from '../commands/change';
-import { mockReviewers } from './mocks';
+import { mockReviewers } from '../__mocks__/index';
+import pullRequestActionMock from '../../pull-request-action/__mocks__/index';
 
 describe('services/command/change', () => {
 
@@ -51,13 +52,7 @@ describe('services/command/change', () => {
           Promise.resolve({ login: 'Spider-Man' })
         )
       };
-      action = {
-        save(reviewers) {
-          pullRequest.review = reviewers;
-
-          return pullRequest;
-        }
-      };
+      action = pullRequestActionMock(pullRequest);
       events = { emit: sinon.stub() };
       logger = { info: sinon.stub() };
       comment = {
@@ -112,10 +107,14 @@ describe('services/command/change', () => {
           { login: 'Spider-Man' }
         ];
 
-        assert.deepEqual(pullRequest.review.reviewers, resultReviewers);
+        assert.calledWithMatch(action.updateReviewers, sinon.match(function (value) {
+          assert.deepEqual(value, resultReviewers);
+          return true;
+        }));
 
         done();
-      }, done);
+      })
+      .catch(done);
     });
 
   });

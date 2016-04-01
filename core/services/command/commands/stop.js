@@ -1,5 +1,3 @@
-'use strict';
-
 import util from 'util';
 
 const EVENT_NAME = 'review:command:stop';
@@ -53,7 +51,7 @@ export default function commandService(options, imports) {
     }
 
     return action
-      .save({ status: 'notstarted' }, pullRequest.id)
+      .stopReview(pullRequest.id)
       .then(pullRequest => {
         events.emit(EVENT_NAME, { pullRequest });
 

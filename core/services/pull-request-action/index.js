@@ -1,6 +1,5 @@
-'use strict';
-
-import { get, assign, isEmpty } from 'lodash';
+import util from 'util';
+import { get, isEmpty } from 'lodash';
 
 export class PullRequestAction {
 
@@ -10,69 +9,174 @@ export class PullRequestAction {
    * @param {Object} options
    * @param {Object} imports
    */
-  constructor(options, imports) {
+  constructor(options, { team, events, logger, pullRequest }) {
     this.options = options;
 
-    this.events = imports.events;
-    this.logger = imports.logger;
-    this.pullRequest = imports.pullRequest;
-    this.team = imports.team;
+    this.team = team;
+    this.events = events;
+    this.logger = logger;
+    this.pullRequest = pullRequest;
   }
 
   /**
-   * Save review.
+   * Start review.
    *
-   * @param {Object} review
    * @param {Number} pullId
    *
    * @return {Promise}
    */
-  save(review, pullId) {
-
-    let startReview = false;
+  startReview(pullId) {
 
     return new Promise((resolve, reject) => {
 
       this.pullRequest
-        .findById(pullId).exec()
+        .findById(pullId)
         .then(pullRequest => {
+          if (!pullRequest) throw new Error('Pull request `${pullId}` not found');
 
-          if (!pullRequest) {
-            throw new Error('Pull request `' + pullId + '` not found');
+          const review = pullRequest.get('review');
+
+          if (review.status !== 'open') {
+            throw new Error(util.format(
+              'Try to start not open review [%s – %s] %s',
+              pullRequest.id,
+              pullRequest.title,
+              pullRequest.html_url
+            ));
           }
 
-          review = assign({}, pullRequest.review, review);
-
-          if (!review.status) {
-            review.status = 'notstarted';
+          if (isEmpty(review.reviewers)) {
+            throw new Error(util.format(
+              'Try to start review where reviewers were not selected [%s – %s] %s',
+              pullRequest.id,
+              pullRequest.title,
+              pullRequest.html_url
+            ));
           }
 
-          if (review.status === 'inprogress' && isEmpty(review.reviewers)) {
-            throw new Error(
-              'Try to start review where reviewers were not selected,' +
-              ' id - ' + pullId + ', title - ' + pullRequest.title
-            );
-          }
-
-          if (pullRequest.review.status !== 'inprogress' && review.status === 'inprogress') {
-            startReview = true;
-            review.started_at = new Date();
-          }
+          review.status = 'inprogress';
+          review.started_at = new Date();
 
           pullRequest.set('review', review);
 
-          return new Promise((resolve, reject) => pullRequest.save().then(resolve, reject));
-
-        }).then(pullRequest => {
-
-          const eventName = startReview ? 'review:started' : 'review:updated';
-
-          this.events.emit(eventName, { pullRequest });
-          this.logger.info('review saved: %s %s', eventName, pullId);
+          return pullRequest.save();
+        })
+        .then(pullRequest => {
+          this.events.emit('review:started', { pullRequest });
+          this.logger.info(
+            'Review started [%s – %s] %s',
+            pullRequest.number,
+            pullRequest.title,
+            pullRequest.html_url
+          );
 
           return pullRequest;
+        })
+        .then(resolve, reject);
 
-        }).then(resolve, reject);
+    });
+
+  }
+
+  /**
+   * Stop review.
+   *
+   * @param {Number} pullId
+   *
+   * @return {Promise}
+   */
+  stopReview(pullId) {
+
+    return new Promise((resolve, reject) => {
+
+      this.pullRequest
+        .findById(pullId)
+        .then(pullRequest => {
+          if (!pullRequest) throw new Error('Pull request `${pullId}` not found');
+
+          const review = pullRequest.get('review');
+
+          if (review.status !== 'inprogress') {
+            this.logger(
+              'Try to stop not in progress review [%s – %s] %s',
+              pullRequest.id,
+              pullRequest.title,
+              pullRequest.html_url
+            );
+          }
+
+          review.status = 'open';
+
+          pullRequest.set('review', review);
+
+          return pullRequest.save();
+
+        })
+        .then(pullRequest => {
+          this.events.emit('review:updated', { pullRequest });
+          this.logger.info(
+            'Review stopped [%s – %s] %s',
+            pullRequest.number,
+            pullRequest.title,
+            pullRequest.html_url
+          );
+
+          return pullRequest;
+        })
+        .then(resolve, reject);
+
+    });
+
+  }
+
+  /**
+   * Update reviewers list.
+   *
+   * @param {Object} reviewers
+   * @param {Number} pullId
+   *
+   * @return {Promise}
+   */
+  updateReviewers(reviewers, pullId) {
+
+    return new Promise((resolve, reject) => {
+
+      this.pullRequest
+      .findById(pullId)
+      .then(pullRequest => {
+
+        if (!pullRequest) throw new Error('Pull request `${pullId}` not found');
+
+        const review = pullRequest.get('review') || {};
+
+        review.reviewers = reviewers;
+
+        if (isEmpty(review.reviewers)) {
+          throw new Error(util.format(
+            'Cannot drop all reviewers from pull request [%s – %s] %s',
+            pullRequest.number,
+            pullRequest.title,
+            pullRequest.html_url
+          ));
+        }
+
+        pullRequest.set('review', review);
+
+        return pullRequest.save();
+      })
+      .then(pullRequest => {
+        this.events.emit('review:updated', { pullRequest });
+
+        this.logger.info(
+          'Reviewers updated [%s – %s] %s',
+          pullRequest.number,
+          pullRequest.title,
+          pullRequest.html_url
+        );
+
+        return pullRequest;
+      })
+      .then(resolve, reject);
 
     });
 
@@ -93,52 +197,68 @@ export class PullRequestAction {
       let approvedCount = 0;
 
       this.pullRequest
-        .findById(pullId).exec()
-        .then(pullRequest => {
+      .findById(pullId)
+      .then(pullRequest => {
 
-          if (!pullRequest) {
-            throw new Error('Pull request `' + pullId + '` not found');
+        if (!pullRequest) {
+          throw new Error('Pull request `${pullId}` not found');
+        }
+
+        const review = pullRequest.get('review');
+        const requiredApprovedCount = this.getRequiredApproveCount(pullRequest);
+
+        review.reviewers.forEach(reviewer => {
+          if (reviewer.login === login) {
+            reviewer.approved = true;
           }
 
-          const review = pullRequest.get('review');
-          const requiredApprovedCount = this.getRequiredApproveCount(pullRequest);
-
-          review.reviewers.forEach(reviewer => {
-            if (reviewer.login === login) {
-              reviewer.approved = true;
-            }
-
-            if (reviewer.approved) {
-              approvedCount += 1;
-            }
-
-            if (approvedCount >= requiredApprovedCount) {
-              review.status = 'complete';
-            }
-          });
-
-          review.updated_at = new Date();
-          if (review.status === 'complete') {
-            review.completed_at = new Date();
+          if (reviewer.approved) {
+            approvedCount += 1;
           }
 
-          pullRequest.set('review', review);
-
-          return pullRequest.save();
-
-        }).then(pullRequest => {
-
-          if (pullRequest.review.status === 'complete') {
-            this.logger.info('review complete #%s', pullId);
-            this.events.emit('review:complete', { pullRequest });
-          } else {
-            this.logger.info('review approved #%s by %s', pullId, login);
-            this.events.emit('review:approved', { pullRequest, login });
+          if (approvedCount >= requiredApprovedCount) {
+            review.status = 'complete';
           }
+        });
 
-          return pullRequest;
+        review.updated_at = new Date();
+        if (review.status === 'complete') {
+          review.completed_at = new Date();
+        }
 
-        }).then(resolve, reject);
+        pullRequest.set('review', review);
+
+        return pullRequest.save();
+
+      })
+      .then(pullRequest => {
+
+        if (pullRequest.get('review.status') === 'complete') {
+          this.logger.info(
+            'Review complete [%s – %s] %s',
+            pullRequest.number,
+            pullRequest.title,
+            pullRequest.html_url
+          );
+
+          this.events.emit('review:approved', { pullRequest, login });
+          this.events.emit('review:complete', { pullRequest });
+        } else {
+          this.logger.info(
+            'Review approved by %s [%s - %s] %s',
+            login,
+            pullRequest.number,
+            pullRequest.title,
+            pullRequest.html_url
+          );
+
+          this.events.emit('review:approved', { pullRequest, login });
+        }
+
+        return pullRequest;
+
+      })
+      .then(resolve, reject);
 
     });
 
@@ -152,21 +272,25 @@ export class PullRequestAction {
    * @return {Number}
    */
   getRequiredApproveCount(pullRequest) {
-    const teamName = this.team.getTeamName(pullRequest);
+    const teamName = this.team.findTeamNameByPullRequest(pullRequest);
 
-    return get(this.options, [teamName, 'approveCount'], this.options.defaultApproveCount);
+    return get(
+      this.options,
+      [teamName, 'approveCount'],
+      this.options.defaultApproveCount
+    );
   }
 
 }
 
-export default function (options, imports) {
+export default function setup(options, imports) {
 
-  const { model, events, logger, 'choose-team': team } = imports;
+  const { events, logger, 'choose-team': team } = imports;
   const service = new PullRequestAction(options, {
-    pullRequest: model.get('pull_request'),
-    events,
+    team,
     logger,
-    team
+    events,
+    pullRequest: imports['pull-request-model']
   });
 
   return service;

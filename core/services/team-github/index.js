@@ -1,13 +1,9 @@
-'use strict';
-
 import GitHubTeam from './github';
 
-export default function (options, imports) {
+export default function setup(options, imports) {
 
   const github = imports.github;
 
-  const service = new GitHubTeam(github, options && options.slug);
-
-  return service;
+  return new GitHubTeam(github, options.slug);
 
 }

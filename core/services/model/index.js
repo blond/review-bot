@@ -1,12 +1,10 @@
-'use strict';
-
 import _ from 'lodash';
 import { Schema } from 'mongoose';
 
 import { AddonBroker } from './addon-broker';
 import * as pullRequest from './models/pull-request';
 
-export default function (options, imports) {
+export default function setup(options, imports) {
 
   const mongoose = imports.mongoose;
 
@@ -30,14 +28,12 @@ export default function (options, imports) {
   const addonBroker = new AddonBroker(saveHooks, extenders);
 
   const setup = function setup(modelName, module) {
-    const schema = module.setupSchema();
+    const schema0 = module.setupSchema();
+    const schema1 = addonBroker.setupExtenders(modelName, schema0);
 
-    addonBroker.setupExtenders(modelName, schema);
-
-    const model = new Schema(schema);
+    const model = new Schema(schema1);
 
     module.setupModel(modelName, model);
-
     addonBroker.setupSaveHooks(modelName, model);
 
     mongoose.model(modelName, model);

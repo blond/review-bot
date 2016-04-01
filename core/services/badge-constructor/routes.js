@@ -1,11 +1,17 @@
-'use strict';
-
-import middleware from 'badgs/lib/middleware';
-
 import Badgs from 'badgs';
+import middleware from 'badgs/lib/middleware';
 import { Router as router } from 'express';
 
-export default function badgeRouterCreator(options, imports) {
+/**
+ * Creator adds middleware to render badges.
+ * It parses urls like `/subject-status-color` and then sends a svg image using parsed data.
+ *
+ * @param {Object} options
+ * @param {Object} imports
+ *
+ * @return {Router}
+ */
+export default function setup(options, imports) {
 
   const badge = new Badgs(options.template);
   const badgeRouter = router();

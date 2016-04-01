@@ -1,5 +1,3 @@
-'use strict';
-
 import _ from 'lodash';
 
 export class AddonBroker {
@@ -54,13 +52,17 @@ export class AddonBroker {
    *
    * @param {String} name - model name.
    * @param {Object} schema - model base schema.
+   *
+   * @return {Object} extended schema
    */
   setupExtenders(name, schema) {
-    const extenders = this.get(name).extenders;
+    let newSchema = _.cloneDeep(schema);
 
-    _.forEach(extenders, extender => {
-      _.merge(schema, extender(schema));
+    _.forEach(this.get(name).extenders, (extender) => {
+      newSchema = _.merge(newSchema, extender(schema));
     });
+
+    return newSchema;
   }
 
 }

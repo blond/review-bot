@@ -1,18 +1,8 @@
 import { cloneDeep, filter, forEach } from 'lodash';
-import { mockMembers } from './mocks/index';
-import { isMatch, isMatchAll, getFiles, incRank, decRank, pathRelatedCreator } from '../steps/path-related';
+import { mockMembers } from '../__mocks__/index';
+import { isMatch, isMatchAll, getFiles, incRank, decRank } from '../steps/path-related';
 
 describe('services/choose-reviewer-steps/path-related', () => {
-  it('should always be resolved', done => {
-    const pathRelated = pathRelatedCreator({});
-    const pullRequest = {
-      get: sinon.stub().returns([])
-    };
-
-    pathRelated({ pullRequest })
-      .then(() => done())
-      .catch(done);
-  });
 
   describe('#isMatch', () => {
     it('should return true if pattern match files pathes', () => {

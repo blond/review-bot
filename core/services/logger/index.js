@@ -1,8 +1,6 @@
-'use strict';
-
 import winston, { Logger } from 'winston';
 
-export default function (options, imports) {
+export default function setup(options, imports) {
 
   const transports = options.transports.map(transport => {
     if (!('timestamp' in transport)) {
@@ -21,8 +19,6 @@ export default function (options, imports) {
     }
   });
 
-  const service = new Logger({ transports });
-
-  return service;
+  return new Logger({ transports });
 
 }

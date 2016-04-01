@@ -76,7 +76,7 @@ export class ReviewBadgeBuilder extends BadgeBase {
   buildReviewerBadge(reviewer) {
     return this.create(
       reviewer.login,
-      reviewer.approved ? 'ok' : '...',
+      reviewer.approved ? 'ok' : '…',
       reviewer.approved ? 'green' : 'yellow',
       reviewer.html_url
     );
@@ -100,12 +100,35 @@ export class ReviewBadgeBuilder extends BadgeBase {
 
 }
 
-
 export default function (options, imports) {
+  const queue = imports.queue;
   const events = imports.events;
-  const bodyUpdateDispatcher = imports['pull-request-body-queue'];
+  const logger = imports.logger;
+  const pullRequestModel = imports['pull-request-model'];
+  const pullRequestGithub = imports['pull-request-github'];
 
   const builder = new ReviewBadgeBuilder(options.url);
+
+  function updatePullRequestBody(pullRequest) {
+    const badgeContent = builder.build(pullRequest.get('review'));
+
+    return pullRequestGithub.setBodySection(
+      pullRequest.id, // pull id
+      'review:badge', // section id
+      badgeContent,   // content
+      100             // position
+    );
+  }
+
+  function logReviewBadgesUpdate(pullRequest) {
+    logger.info(
+      'Review badges updated [%s – %s] %s',
+      pullRequest.number,
+      pullRequest.title,
+      pullRequest.html_url
+    );
+  }
+
 
   /**
    * Call method for updating pull request body with review badges.
@@ -113,21 +136,26 @@ export default function (options, imports) {
    * @param {Object} payload
    */
   function updateReviewBadges(payload) {
-    const badgeContent = builder.build(payload.pullRequest.review);
+    const pullId = payload.pullRequest.id;
 
-    bodyUpdateDispatcher.setSection(
-      payload.pullRequest.id,
-      'review:badge',
-      badgeContent,
-      100 // position
-    );
+    queue
+      .dispatch('pull-request-body-update#' + pullId, () => {
+        return new Promise((resolve, reject) => {
+          pullRequestModel
+            .findById(pullId)
+            .then(updatePullRequestBody)
+            .then(logReviewBadgesUpdate)
+            .then(resolve, reject);
+        });
+      })
+      .catch(::logger.error);
   }
 
   // Subscribe on events for creating review badges.
-  events.on('review:updated', updateReviewBadges);
   events.on('review:started', updateReviewBadges);
+  events.on('review:updated', updateReviewBadges);
   events.on('review:approved', updateReviewBadges);
   events.on('review:complete', updateReviewBadges);
 
-  return builder;
+  return {};
 }

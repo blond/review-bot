@@ -1,11 +1,7 @@
-'use strict';
-
 import StaticTeam from './static';
 
-export default function (options, imports) {
+export default function setup(options, imports) {
 
-  const service = new StaticTeam(options.members);
-
-  return service;
+  return new StaticTeam(options.members);
 
 }

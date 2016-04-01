@@ -1,6 +1,5 @@
-'use strict';
-
 import _ from 'lodash';
+import { getUserLogin } from '../model/models/pull-request';
 
 export default class GitHubTeam {
 
@@ -16,7 +15,7 @@ export default class GitHubTeam {
   }
 
   getTeam(pullRequest) {
-    const orgName = pullRequest.organization.login;
+    const orgName = getUserLogin(pullRequest);
 
     if (!this.slugName) {
       return this.getOrgMembers(orgName);
@@ -27,19 +26,14 @@ export default class GitHubTeam {
     }
   }
 
-  getMember(pullRequest, login) {
-    return this
-      .getTeam(pullRequest)
-      .then(team => _.find(team, { login }));
-  }
-
   getOrgMembers(orgName) {
     return new Promise((resolve, reject) => {
       const req = { org: orgName, per_page: 100 };
 
       this.github.orgs.getMembers(req, (error, result) => {
         if (error) {
-          return reject(new Error('GitHub API error: ' + error));
+          reject(new Error('GitHub API error: ' + error));
+          return;
         }
 
         resolve(result);
@@ -51,13 +45,15 @@ export default class GitHubTeam {
     return new Promise((resolve, reject) => {
       this.github.orgs.getTeams({ org: orgName, per_page: 100 }, (error, result) => {
         if (error) {
-          return reject(new Error('GitHub API error: ' + error));
+          reject(new Error('GitHub API error: ' + error));
+          return;
         }
 
         const team = _.head(_.filter(result, { slug: teamName }), 1);
 
         if (!team) {
-          return reject(new Error('GitHub API: Slug `' + teamName + '` not found'));
+          reject(new Error('GitHub API: Slug `' + teamName + '` not found'));
+          return;
         }
 
         resolve(team.id);

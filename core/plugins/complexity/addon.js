@@ -1,5 +1,3 @@
-'use strict';
-
 import * as complexity from './complexity';
 
 const MAX = 40;

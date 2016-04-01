@@ -1,7 +1,8 @@
 import { clone } from 'lodash';
 
 import service from '../commands/ok';
-import { mockReviewers } from './mocks';
+import { mockReviewers } from '../__mocks__/index';
+import pullRequestActionMock from '../../pull-request-action/__mocks__/index';
 
 describe('services/command/ok', () => {
   let action, pullRequest, team, events, payload, logger, comment, command; // eslint-disable-line
@@ -26,15 +27,7 @@ describe('services/command/ok', () => {
       }
     };
 
-    action = {
-      save(reviewers) {
-        pullRequest.review = reviewers;
-
-        return pullRequest;
-      },
-
-      approveReview: sinon.stub().returns(Promise.resolve(pullRequest))
-    };
+    action = pullRequestActionMock(pullRequest);
 
     command = service({}, { action, team, events, logger });
 
@@ -62,10 +55,10 @@ describe('services/command/ok', () => {
   it('should add new reviewer to pull request', done => {
     command('/ok', payload)
       .then(pullRequest => {
-        assert.deepEqual(
-          pullRequest.review.reviewers,
-          [{ login: 'Hulk' }, { login: 'Thor' }, { login: 'Hawkeye' }]
-        );
+        assert.calledWithMatch(action.updateReviewers, sinon.match(function (value) {
+          assert.deepEqual(value, [{ login: 'Hulk' }, { login: 'Thor' }, { login: 'Hawkeye' }]);
+          return true;
+        }));
         done();
       })
       .catch(done);

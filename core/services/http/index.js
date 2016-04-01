@@ -1,31 +1,19 @@
-'use strict';
-
 import _ from 'lodash';
-import path from 'path';
 import express from 'express';
 
 import bodyParser from 'body-parser';
 import responseTime from 'response-time';
-
 import responseJSON from './response';
 
-export default function (options, imports) {
+export default function setup(options, imports, provide) {
 
   const app = express();
-  const port = options.port || 8080;
+  const port = options.port;
   const logger = imports.logger;
-
-  const assetsPath = path.join(__dirname, '..', '..', 'assets');
 
   app.use(responseTime());
   app.use(bodyParser.json());
-
   app.use(responseJSON());
-
-  const faviconFile = path.join(assetsPath, 'favicon.ico');
-  app.get('/favicon.ico', function (req, res) {
-    res.sendFile(faviconFile);
-  });
 
   _.forEach(options.routes || {}, (router, route) => {
     const routerModule = imports[router];
@@ -33,25 +21,16 @@ export default function (options, imports) {
     app.use(route, routerModule);
   });
 
-  return new Promise(provide => {
-    const server = app.listen(port, () => {
-      logger.info(
-        'Server listening at %s:%s',
-        server.address().address,
-        server.address().port
-      );
+  const server = app.listen(port, () => {
+    logger.info(
+      'Server listening at %s:%s',
+      server.address().address,
+      server.address().port
+    );
 
-      server.shutdown = function () {
-        return new Promise((resolve, reject) => {
-          server.close(function (error) {
-            error ? reject(error) : resolve();
-          });
-        });
-      };
+    server.shutdown = (callback) => server.close(callback);
 
-      provide(server);
-    });
-
+    provide(server);
   });
 
 }

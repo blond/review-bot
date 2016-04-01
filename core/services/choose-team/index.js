@@ -1,5 +1,3 @@
-'use strict';
-
 import _ from 'lodash';
 
 import Team from './team';
@@ -27,7 +25,7 @@ Example of config:
 
 */
 
-export default function (options, imports) {
+export default function setup(options, imports) {
 
   const routes = [];
 
@@ -46,13 +44,16 @@ export default function (options, imports) {
       }
 
       const getTeam = source.getTeam.bind(source);
-      const getMember = source.getMember.bind(source);
 
       if (!Array.isArray(pattern)) {
-        routes.push({ getTeam, getMember, pattern });
+        routes.push({ team: sourceName, getTeam, pattern });
       } else {
         pattern.forEach(sourcePattern => {
-          routes.push({ getTeam, getMember, pattern: sourcePattern, team: sourceName });
+          routes.push({
+            team: sourceName,
+            getTeam: getTeam,
+            pattern: sourcePattern
+          });
         });
       }
 

@@ -7,17 +7,17 @@
   "repository": {
     "url": "https://github.com/devexp-org/devexp"
   },
-  "main": "app.js",
+  "main": "start.js",
   "pre-commit": [
-    "test",
-    "eslint"
+    "eslint",
+    "test"
   ],
   "precommit.silent": true,
   "scripts": {
-    "test": "mocha --compilers js:babel-register -r ./core/tests/setup.js -R spec core/**/**/__tests__/**.js",
-    "test:watch": "mocha --compilers js:babel-register -w -r ./core/tests/setup.js -R spec core/**/**/__tests__/**.js",
+    "test": "$npm_package_config_mocha --reporter spec $npm_package_config_pattern_test",
+    "test:watch": "$npm_package_config_mocha --watch --reporter spec $npm_package_config_pattern_test",
     "eslint": "eslint .",
-    "coverage": "babel-node ./node_modules/.bin/isparta cover --report text --report lcovonly --report html ./node_modules/.bin/_mocha -- -r ./core/tests/setup.js -R dot */**/**/__tests__/*.js",
+    "coverage": "babel-node ./node_modules/.bin/isparta cover --report text --report lcovonly --report html _mocha -- -r ./core/tests/setup.js --reporter dot $npm_package_config_pattern_test",
     "coveralls": "npm run coverage && cat ./coverage/lcov.info | coveralls && rm -rf ./coverage",
     "start": "nodemon start.js -e js,json,html --ignore node_modules/",
     "postinstall": ".scripts/postinstall.sh"
@@ -53,9 +53,12 @@
     "nodemon": "^1.8.1",
     "pre-commit": "^1.1.2",
     "proxyquire": "^1.7.3",
-    "sinon": "^1.17.2"
+    "sinon": "^1.17.2",
+    "supertest": "^1.2.0"
   },
   "config": {
+    "mocha": "mocha --compilers js:babel-register -r ./core/tests/setup.js",
+    "pattern_test": "./core/**/__tests__/**.js",
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
     }

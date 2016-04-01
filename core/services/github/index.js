@@ -1,8 +1,6 @@
-'use strict';
-
 import GitHub from 'github';
 
-export default function (options, imports) {
+export default function setup(options, imports) {
 
   const github = new GitHub(options);
 

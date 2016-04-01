@@ -1,6 +1,7 @@
+import _ from 'lodash';
 import service from '../../review-autoassign';
 
-describe('service/review-autoassign', function () {
+describe('plugins/review-autoassign', function () {
 
   let options, imports, payload, reviewResult;
 
@@ -20,7 +21,7 @@ describe('service/review-autoassign', function () {
         review: sinon.stub()
       },
       'pull-request-action': {
-        save: sinon.stub()
+        updateReviewers: sinon.stub()
       }
     };
 
@@ -30,6 +31,9 @@ describe('service/review-autoassign', function () {
         title: 'title',
         review: {
           reviewers: []
+        },
+        get(path) {
+          return _.get(payload.pullRequest, path);
         }
       }
     };
@@ -54,8 +58,8 @@ describe('service/review-autoassign', function () {
 
     setTimeout(function () {
       assert.calledWithExactly(
-        imports['pull-request-action'].save,
-        { reviewers: reviewResult.team },
+        imports['pull-request-action'].updateReviewers,
+        reviewResult.team,
         1
       );
       done();
@@ -69,7 +73,7 @@ describe('service/review-autoassign', function () {
 
     service(options, imports);
 
-    assert.notCalled(imports['pull-request-action'].save);
+    assert.notCalled(imports['pull-request-action'].updateReviewers);
 
   });
 

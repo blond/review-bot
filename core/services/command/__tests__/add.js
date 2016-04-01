@@ -4,7 +4,8 @@ import parseLogins from '../../parse-logins/parse-logins';
 
 import service from '../commands/add';
 import { getParticipant } from '../commands/add';
-import { mockReviewers } from './mocks';
+import { mockReviewers } from '../__mocks__/index';
+import pullRequestActionMock from '../../pull-request-action/__mocks__/index';
 
 describe('services/command/add', () => {
 
@@ -44,7 +45,7 @@ describe('services/command/add', () => {
           Promise.resolve({ login: 'Hawkeye' })
         )
       };
-      action = { save: sinon.stub().returns(Promise.resolve(pullRequest)) };
+      action = pullRequestActionMock(pullRequest);
       events = { emit: sinon.stub() };
       logger = { info: sinon.stub() };
       comment = {
@@ -76,7 +77,7 @@ describe('services/command/add', () => {
         const resultReviewers = clone(mockReviewers);
         resultReviewers.push({ login: 'Hawkeye' });
 
-        assert.called(action.save);
+        assert.called(action.updateReviewers);
         assert.deepEqual(pullRequest.get('review.reviewers'), resultReviewers);
 
         done();

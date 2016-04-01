@@ -1,5 +1,3 @@
-'use strict';
-
 import { isEmpty } from 'lodash';
 
 export default class Queue {

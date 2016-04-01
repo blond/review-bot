@@ -1,5 +1,3 @@
-'use strict';
-
 import util from 'util';
 import { find } from 'lodash';
 
@@ -31,28 +29,21 @@ export default function commandService(options, imports) {
       pullRequest.html_url
     );
 
-    let status = pullRequest.review.status;
-
-    if (commenter) {
-      commenter.approved = false;
-
-      if (status === 'complete') {
-        status = 'notstarted';
-      }
-
-      return action
-        .save({ reviewers, status }, pullRequest.id)
-        .then(pullRequest => {
-          events.emit(EVENT_NAME, { pullRequest });
-        });
-
-    } else {
+    if (!commenter) {
       return Promise.reject(new Error(util.format(
         '%s tried to cancel approve, but he is not in reviewers list [%s – %s] %s',
         login, pullRequest.number, pullRequest.title, pullRequest.html_url
       )));
     }
 
+    commenter.approved = false;
+
+    return action
+      .updateReviewers(reviewers, pullRequest.id)
+      .then(pullRequest => action.stopReview(pullRequest.id))
+      .then(pullRequest => {
+        events.emit(EVENT_NAME, { pullRequest });
+      });
   };
 
   return notOkCommand;

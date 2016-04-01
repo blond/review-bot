@@ -1,8 +1,8 @@
 import util from 'util';
 import { isEmpty, get } from 'lodash';
 
-export function getStepsFactory(opts, imports) {
-  const { team } = imports;
+export function getStepsFactory(options, imports) {
+  const team = imports['choose-team'];
 
   /**
    * Get steps for team.
@@ -12,41 +12,45 @@ export function getStepsFactory(opts, imports) {
    * @return {Object} { steps, stepOptions }
    */
   return function getChooseReviewerSteps(pullRequest) {
-    const teamName = team.getTeamName(pullRequest);
+    const teamName = team.findTeamNameByPullRequest(pullRequest);
 
     if (!teamName) {
       return Promise.reject(new Error(util.format(
         'Team not found for pull request [%s – %s] %s',
-        pullRequest.number,
+        pullRequest.id,
         pullRequest.title,
         pullRequest.html_url
       )));
     }
 
-    const stepsList = get(opts, [teamName, 'steps']) || get(opts, ['default', 'steps']);
+    const steps = get(options, [teamName, 'steps']) ||
+      get(options, ['default', 'steps']);
 
-    if (isEmpty(stepsList)) {
+    if (isEmpty(steps)) {
       return Promise.reject(new Error(util.format(
-        'There aren`t any choose reviewer steps for given team — %s',
+        'There aren\'t any choose reviewer steps for given team — %s',
         team
       )));
     }
 
-    const steps = stepsList.map(name => {
-      const ranker = imports[name];
+    return Promise.resolve(
+      steps.map(name => {
+        const ranker = imports[name];
 
-      if (!ranker) throw new Error(`There is no choose reviewers step with name — ${name}`);
+        if (!ranker) {
+          throw new Error(util.format(
+            'There is no choose reviewer step with name "%s"',
+            name
+          ));
+        }
 
-      return ranker;
-    });
-
-    return Promise.resolve(steps);
+        return ranker;
+      })
+    );
   };
 }
 
-export default function chooseReviewerStepsService(options, imports) {
-  imports.team = imports['choose-team'];
-
+export default function setup(options, imports) {
   const service = getStepsFactory(options, imports);
 
   return service;

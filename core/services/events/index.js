@@ -1,8 +1,6 @@
-'use strict';
-
 import { EventEmitter } from 'events';
 
-export default function (options, imports) {
+export default function setup() {
 
   return new EventEmitter();
 

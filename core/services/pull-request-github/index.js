@@ -1,16 +1,5 @@
-'use strict';
-
 import _ from 'lodash';
-
-/**
- * Check user organization membership and return login
- * @param {Object} local PullRequst in db
- * @return {String}
- */
-function getLogin(local) {
-  // if user and project in organization
-  return local.organization && local.organization.login ? local.organization.login : local.user.login;
-}
+import { getUserLogin } from '../model/models/pull-request';
 
 export class PullRequestGitHub {
 
@@ -36,10 +25,10 @@ export class PullRequestGitHub {
     };
   }
 
-  loadPullRequest(local) {
+  loadPullRequestFromGitHub(local) {
     return new Promise((resolve, reject) => {
       const req = {
-        user: getLogin(local),
+        user: getUserLogin(local),
         repo: local.repository.name,
         number: local.number
       };
@@ -56,7 +45,7 @@ export class PullRequestGitHub {
     });
   }
 
-  savePullRequest(remote) {
+  savePullRequestToDatabase(remote) {
     return new Promise((resolve, reject) => {
       this.pullRequest
         .findById(remote.id)
@@ -75,10 +64,10 @@ export class PullRequestGitHub {
     });
   }
 
-  updatePullRequest(local) {
+  updatePullRequestOnGitHub(local) {
     return new Promise((resolve, reject) => {
       const req = {
-        user: getLogin(local),
+        user: getUserLogin(local),
         repo: local.repository.name,
         body: local.body,
         title: local.title,
@@ -100,7 +89,7 @@ export class PullRequestGitHub {
   loadPullRequestFiles(local) {
     return new Promise((resolve, reject) => {
       const req = {
-        user: getLogin(local),
+        user: getUserLogin(local),
         repo: local.repository.name,
         number: local.number,
         per_page: 100
@@ -108,8 +97,6 @@ export class PullRequestGitHub {
 
       this.github.pullRequests.getFiles(req, (err, files) => {
         if (err) {
-          this.logger.error(err);
-
           reject(new Error('Cannot receive files from the pull request:\n' + err));
         } else {
           resolve(files.map(file => { delete file.patch; return file; }));
@@ -120,11 +107,11 @@ export class PullRequestGitHub {
 
   syncPullRequest(local) {
     return this
-      .loadPullRequest(local)
-      .then(remote => this.savePullRequest(remote));
+      .loadPullRequestFromGitHub(local)
+      .then(remote => this.savePullRequestToDatabase(remote));
   }
 
-  setBodySection(id, sectionId, content, pos = 99999) {
+  setBodySection(id, sectionId, content, position = Infinity) {
     return this.pullRequest
       .findById(id)
       .then(local => {
@@ -136,20 +123,20 @@ export class PullRequestGitHub {
       })
       .then(local => {
         const section = _.clone(local.get('section') || {});
-        section[sectionId] = { content, pos };
+        section[sectionId] = { content, position };
         local.set('section', section);
 
         this.fillPullRequestBody(local);
 
         return local.save();
       })
-      .then(this.updatePullRequest.bind(this));
+      .then(this.updatePullRequestOnGitHub.bind(this));
   }
 
   buildBodyContent(section) {
     return _.values(section)
-      .map(s => { return s.pos ? s : { pos: 99999, content: s }; })
-      .sort((a, b) => a.pos > b.pos ? 1 : a.pos < b.pos ? -1 : 0) // eslint-disable-line
+      .map(s => { return s.position ? s : { position: Infinity, content: s }; })
+      .sort((a, b) => a.position > b.position ? 1 : a.position < b.position ? -1 : 0) // eslint-disable-line
       .map(s => '<div>' + s.content + '</div>')
       .join('');
   }
@@ -173,10 +160,10 @@ export class PullRequestGitHub {
 
       if (end !== -1) {
         const after = body.substr(end + this.separator.bottom.length);
-        return before.trim() + after.trim();
+        return [before.trim(), after.trim()].filter(Boolean).join('\n');
       }
 
-      return before.trim();
+      return body;
     }
 
     return body;
@@ -184,14 +171,14 @@ export class PullRequestGitHub {
 
 }
 
-export default function (options, imports) {
-  const model = imports.model;
+export default function setup(options, imports) {
 
   const service = new PullRequestGitHub(
-    model.get('pull_request'),
+    imports['pull-request-model'],
     options,
     imports
   );
 
   return service;
+
 }

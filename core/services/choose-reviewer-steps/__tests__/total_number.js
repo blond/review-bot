@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { mockMembers } from './mocks/index';
+import { mockMembers } from '../__mocks__/index';
 import service from '../steps/total_number';
 
 describe('services/choose-reviewer-steps/total_number', () => {

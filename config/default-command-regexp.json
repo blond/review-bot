@@ -1,0 +1,40 @@
+{
+  "commands": [
+    {
+      "test": "\/start",
+      "handlers": ["command-start"]
+    },
+    {
+      "test": "\/stop",
+      "handlers": ["command-stop"]
+    },
+    {
+      "test": "\/?ping",
+      "handlers": ["command-ping"]
+    },
+    {
+      "test": "\/ok|\/ок|^ok|^ок",
+      "handlers": ["command-ok"]
+    },
+    {
+      "test": "\/?!ok|\/?!ок$$",
+      "handlers": ["command-not-ok"]
+    },
+    {
+      "test": "\/busy",
+      "handlers": ["command-busy"]
+    },
+    {
+      "test": "\/add|\\+@?[a-z]\\w+",
+      "handlers": ["command-add"]
+    },
+    {
+      "test": "\/change",
+      "handlers": ["command-change"]
+    },
+    {
+      "test": "\/remove|\\-@?[a-z]\\w+",
+      "handlers": ["command-remove"]
+    }
+  ]
+}

@@ -1,5 +1,3 @@
-'use strict';
-
 import util from 'util';
 import { find, reject, cloneDeep, isEmpty } from 'lodash';
 
@@ -108,8 +106,9 @@ export default function commandService(options, imports) {
         reviewers = reject(reviewers, { login: oldReviewerLogin });
         reviewers.push(newReviewer);
 
-        return action.save({ reviewers }, pullRequest.id);
-      }).then(pullRequest => {
+        return action.updateReviewers(reviewers, pullRequest.id);
+      })
+      .then(pullRequest => {
         events.emit(EVENT_NAME, { pullRequest });
       });
   };

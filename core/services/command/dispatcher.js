@@ -28,7 +28,7 @@ export default class CommandDispatcher {
           forEach(command.handlers, handler => {
             const commentCommand = line.trim();
 
-            promise.push(handler(commentCommand, payload));
+            promise.push(handler(commentCommand, payload, command.test));
           });
         }
       });

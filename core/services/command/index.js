@@ -2,12 +2,11 @@ import _ from 'lodash';
 import CommandDispatcher from './dispatcher';
 
 export function constructRegexp(commandRegexp) {
-  return new RegExp('(^|\\b|\\W|\\s)(' + commandRegexp + ')(\\s|\\b|\\W|$)', 'i');
+  return new RegExp('(?:^|\\W)(' + commandRegexp + ')(?:\\W|$)', 'i');
 }
 
-export default function command(options, imports) {
-  const { queue, model, events, logger } = imports;
-  const pullRequestModel = model.get('pull_request');
+export default function setup(options, imports) {
+  const { queue, events, logger, 'pull-request-model': pullRequestModel } = imports;
 
   const wrapHandler = function (handler) {
     return function (commentCommand, payload) {

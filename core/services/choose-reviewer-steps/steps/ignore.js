@@ -12,13 +12,17 @@ export default function ignoreService(options = {}) {
   const list = options.list || [];
 
   function ignore(review, payload) {
+
     if (isEmpty(review.team) || isEmpty(list)) {
       return Promise.resolve(review);
     }
 
-    review.team = reject(review.team, member => includes(list, member.login));
+    review.team = reject(review.team, (member) => {
+      return includes(list, member.login);
+    });
 
     return Promise.resolve(review);
+
   }
 
   return ignore;

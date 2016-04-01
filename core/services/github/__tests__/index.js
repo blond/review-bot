@@ -15,7 +15,8 @@ describe('services/github', function () {
 
   });
 
-  it('should authenticate to GitHub if credentials is provided', function () {
+  it.skip('should authenticate to GitHub if credentials was given', function () {
+
     const options = {
       version: '3.0.0',
       authenticate: {

@@ -35,7 +35,9 @@ export function isMatchAll(files, patterns) {
 export function getFiles(pullRequest) {
   const files = pullRequest.get('files');
 
-  if (isEmpty(files)) return Promise.reject(new Error('No files in pull request'));
+  if (isEmpty(files)) {
+    return Promise.reject(new Error('No files in pull request'));
+  }
 
   return Promise.resolve(files);
 }
