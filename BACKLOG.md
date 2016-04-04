@@ -1,34 +1,31 @@
 # MAJOR
-* добавить email, как траспорт, для доставки уведомлений
-* добавить модель 'Пользователь' и хранить там настройки уведомлений
-* добавить команду '/replace "username"' для смены одного из ревьювиров на случайного
-* логировать промежуточные итоги выбора ревьювира и сохранять в БД
-* переиспользоать regexp'ы от команд.
-* перенести шаблоны уведомлений в БД
-* перенести часть настроек в БД
+  * логировать промежуточные итоги выбора ревьювира и сохранять в БД
+  * добавить модель 'Пользователь' и хранить там настройки уведомлений
+  * добавить команду '/replace "username"' для смены одного из ревьювиров на случайного
+    * добавить тест в integration.sh
 
-
-# MINOR
-
+# BACKLOG
+  * добавить способ для логирования событий связанных с пулл-реквестами.
+    * чтобы сократить запись `logger.info("... [%s – %s] %s", pr.number, pr.title, pr.html_url)`
+  * добавить email, как траспорт, для доставки уведомлений
+  * отказаться от parseLogin и переиспользоать regexp'ы команд.
+    * добавить возможность указывать в выражении логины, например так, `[:login:]`.
+    * складывать логины в подмаски, и использовать их в командах, например так, `/add ([:login:])`.
+  * перенести часть настроек в БД.
+    * от настроек может потребоватся запуск, ранее не запущенных, служб.
+    * нужно иметь возможность добавить в конфиг новые службы на стадии старта приложения.
+  * перенести шаблоны уведомлений в БД.
 
 # REFACTOR
-
+  * объеденить model action github
+  * объеденить choose-reviewer и steps
+  * использовать в логах pullRequest.toString();
 
 # CHECKLIST
-[ ] events
-[ ] logger
-[ ] mongoose
-[ ] model
-[ ] github
-[ ] http
-[ ] queue
-[ ] choose-team
-[ ] choose-reviewer
-[ ] choose-reviewer-steps
-[ ] pull-request-github
-[ ] pull-request-action
-[ ] command
-[ ] jabber
-[ ] review-notification
-[ ] plugin-review-badges
-[ ] plugin-reivew-autoassign
+  * modules/badge-base
+  * modules/config
+  * plugins/complexity
+  * plugins/review-autoassign
+  * plugins/review-badges
+  * services/badge-constructor
+  * services/choose-reviewer-steps

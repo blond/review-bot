@@ -55,15 +55,13 @@
         "port": "8080",
         "routes": {
           "/badges": "http-routes-badges",
-          "/github": "http-routes-github",
-          "/favicon.ico": "http-routes-favicon"
+          "/github": "http-routes-github"
         }
       },
       "dependencies": [
         "logger",
         "http-routes-badges",
-        "http-routes-github",
-        "http-routes-favicon"
+        "http-routes-github"
       ]
     },
 

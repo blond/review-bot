@@ -2,10 +2,18 @@ import fs from 'fs';
 import path from 'path';
 import _ from 'lodash';
 
+/**
+ * Return parsed json file if the file exists.
+ * Otherwise return an empty object.
+ *
+ * @param {String} configPath
+ * @return {Object}
+ */
 const requireIfExists = function (configPath) {
   if (fs.existsSync(configPath)) {
     return JSON.parse(fs.readFileSync(configPath));
   }
+
   return {};
 };
 
@@ -46,18 +54,22 @@ export function transform(basePath, json) {
 export default function config(basePath, envName) {
 
   envName = envName || process.env.NODE_ENV || 'development';
-
   basePath = path.join(basePath, 'config');
 
   const join = path.join.bind(path, basePath);
 
-  const defaultConfigPath = join('default.json');
-  const secretConfigPath = join('secret.json');
   const envConfigPath = join(envName + '.json');
+  const envConfigRaw = requireIfExists(envConfigPath);
+  const envConfig = transform(basePath, envConfigRaw);
 
-  const defaultConfig = transform(basePath, requireIfExists(defaultConfigPath));
-  const secretConfig = transform(basePath, requireIfExists(secretConfigPath));
-  const envConfig = transform(basePath, requireIfExists(envConfigPath));
+  const secretConfigPath = join('secret.json');
+  const secretConfigRaw = requireIfExists(secretConfigPath);
+  const secretConfig = transform(basePath, secretConfigRaw);
+
+  const defaultConfigPath = join('default.json');
+  const defaultConfigRaw = requireIfExists(defaultConfigPath);
+  const defaultConfig = transform(basePath, defaultConfigRaw);
+
 
   return _.merge({ env: envName }, defaultConfig, secretConfig, envConfig);
 

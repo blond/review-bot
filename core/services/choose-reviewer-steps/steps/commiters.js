@@ -17,8 +17,6 @@ export function getFiles(pullRequest, ignorePatterns, filesToCheck) {
     return Promise.resolve([]);
   }
 
-  ignorePatterns = ignorePatterns || [];
-
   files = _(files)
     .filter(file => {
       let keep = true;
@@ -139,7 +137,7 @@ export function getSinceDate(date) {
 
   return moment()
     .subtract(date[0], date[1] || 'days')
-    .format('YYYY-MM-DDTHH:MM:SSZ');
+    .format('YYYY-MM-DDTHH:mm:ssZZ');
 }
 
 /**

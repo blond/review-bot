@@ -1,6 +1,6 @@
 import pullRequestMock from './pull_request';
 
-export function mock() {
+export function pullRequestModelMock() {
 
   const stub = function () {
     return pullRequestMock();
@@ -19,7 +19,7 @@ export function mock() {
 export default function () {
   const getStub = sinon.stub();
 
-  getStub.withArgs('pull_request').returns(mock());
+  getStub.withArgs('pull_request').returns(pullRequestModelMock());
 
   return { get: getStub };
 }

@@ -36,9 +36,10 @@ export class PullRequestAction {
 
           const review = pullRequest.get('review');
 
-          if (review.status !== 'open') {
+          if (review.status !== 'notstarted') {
             throw new Error(util.format(
-              'Try to start not open review [%s – %s] %s',
+              'Try to start not open review. status=%s [%s – %s] %s',
+              review.status,
               pullRequest.id,
               pullRequest.title,
               pullRequest.html_url
@@ -97,7 +98,7 @@ export class PullRequestAction {
           const review = pullRequest.get('review');
 
           if (review.status !== 'inprogress') {
-            this.logger(
+            this.logger.info(
               'Try to stop not in progress review [%s – %s] %s',
               pullRequest.id,
               pullRequest.title,
@@ -105,7 +106,7 @@ export class PullRequestAction {
             );
           }
 
-          review.status = 'open';
+          review.status = 'notstarted';
 
           pullRequest.set('review', review);
 

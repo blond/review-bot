@@ -3,7 +3,7 @@ import middleware from 'badgs/lib/middleware';
 import { Router as router } from 'express';
 
 /**
- * Creator adds middleware to render badges.
+ * Add middleware to render badges.
  * It parses urls like `/subject-status-color` and then sends a svg image using parsed data.
  *
  * @param {Object} options
@@ -19,4 +19,5 @@ export default function setup(options, imports) {
   badgeRouter.use(middleware(badge));
 
   return badgeRouter;
+
 }

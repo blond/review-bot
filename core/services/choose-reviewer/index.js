@@ -90,6 +90,9 @@ export class ChooseReviewer {
     return review.steps.reduce((queue, ranker) => {
       return queue.then(review => {
         this.logger.info('Choose reviewer phase is `%s`', ranker.name);
+        this.logger.info(
+          'Temporary ranks: ' + review.team.map(x => x.login + '#' + x.rank).join(' ')
+        );
 
         return ranker(review);
       });

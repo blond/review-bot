@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import * as complexity from '../complexity';
 
-describe('services/complexity', function () {
+describe('plugins/complexity', function () {
 
   describe('#additionsComplexity', function () {
 

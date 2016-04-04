@@ -1,11 +1,4 @@
 {
-  "http-routes-favicon": {
-    "path": "./core/services/http/routes/favicon",
-    "options": {
-      "assets": "./assets"
-    }
-  },
-
   "http-routes-badges": {
     "path": "./core/services/badge-constructor/routes",
     "options": {

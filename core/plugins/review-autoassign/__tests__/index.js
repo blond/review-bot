@@ -1,54 +1,45 @@
-import _ from 'lodash';
 import service from '../../review-autoassign';
+import eventsMock from '../../../services/events/__mocks__/index';
+import loggerMock from '../../../services/logger/__mocks__/index';
+import pullRequestMock from '../../../services/model/__mocks__/pull_request';
+import pullRequestActionMock from '../../../services/pull-request-action/__mocks__/index';
+import chooseReviewerMock from '../../../services/choose-reviewer/__mocks__/index';
 
 describe('plugins/review-autoassign', function () {
 
+  let logger, events, chooseReviewer, pullRequestAction, pullRequest;
   let options, imports, payload, reviewResult;
 
   beforeEach(function () {
 
+    events = eventsMock();
+    logger = loggerMock();
+    pullRequest = pullRequestMock();
+    pullRequestAction = pullRequestActionMock(pullRequest);
+    chooseReviewer = chooseReviewerMock();
+
     options = {};
 
     imports = {
-      logger: {
-        info: sinon.stub(),
-        error: sinon.stub()
-      },
-      events: {
-        on: sinon.stub()
-      },
-      'choose-reviewer': {
-        review: sinon.stub()
-      },
-      'pull-request-action': {
-        updateReviewers: sinon.stub()
-      }
+      logger,
+      events,
+      'choose-reviewer': chooseReviewer,
+      'pull-request-action': pullRequestAction
     };
 
-    payload = {
-      pullRequest: {
-        id: 1,
-        title: 'title',
-        review: {
-          reviewers: []
-        },
-        get(path) {
-          return _.get(payload.pullRequest, path);
-        }
-      }
-    };
+    payload = { pullRequest };
 
     reviewResult = {
       team: ['Captain America', 'Hawkeye']
     };
 
-    imports.events.on
-      .withArgs('github:pull_request:opened').callsArgWith(1, payload);
-    imports.events.on
-      .withArgs('github:pull_request:synchronize').callsArgWith(1, payload);
+    events.on
+      .withArgs('github:pull_request:opened')
+      .callsArgWith(1, payload);
 
-    imports['choose-reviewer'].review
-      .withArgs(1).returns(Promise.resolve(reviewResult));
+    chooseReviewer.review
+      .withArgs(pullRequest.id)
+      .returns(Promise.resolve(reviewResult));
 
   });
 
@@ -58,22 +49,27 @@ describe('plugins/review-autoassign', function () {
 
     setTimeout(function () {
       assert.calledWithExactly(
-        imports['pull-request-action'].updateReviewers,
+        pullRequestAction.updateReviewers,
         reviewResult.team,
         1
       );
       done();
-    }, 10);
+    }, 0);
 
   });
 
-  it('should not restart if reviewer were selected before', function () {
+  it('should not restart if reviewers were selected before', function (done) {
 
-    payload.pullRequest.review.reviewers = [{ login: 'Hulk' }];
+    payload.pullRequest.get
+      .withArgs('review.reviewers')
+      .returns([{ login: 'Hulk' }]);
 
     service(options, imports);
 
-    assert.notCalled(imports['pull-request-action'].updateReviewers);
+    setTimeout(function () {
+      assert.notCalled(pullRequestAction.updateReviewers);
+      done();
+    }, 0);
 
   });
 

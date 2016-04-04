@@ -1,5 +1,4 @@
 /* eslint-disable no-console, no-process-exit */
-'use strict';
 
 import Architect from 'node-architect';
 import parseConfig from './modules/config';
@@ -25,7 +24,6 @@ process.on('SIGINT', () => {
     .shutdown()
     .then(() => {
       console.log('');
-      // process.exit(0);
     })
     .catch(error => {
       console.error(error.stack ? error.stack : error);

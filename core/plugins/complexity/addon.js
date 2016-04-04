@@ -27,7 +27,7 @@ export function extender() {
  */
 export function saveHook(model) {
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     let value = 0;
 
     value += complexity.additionsComplexity(model.additions);

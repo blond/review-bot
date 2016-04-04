@@ -1,8 +1,8 @@
 import _ from 'lodash';
 
-import { mockMembers } from '../__mocks__/index';
 import service from '../steps/commiters';
-import { getFiles, getCommits, getCommiters } from '../steps/commiters';
+import { mockMembers } from '../__mocks__/index';
+import { getFiles, getCommits, getCommiters, getSinceDate } from '../steps/commiters';
 
 describe('services/choose-reviewer-steps/commiters', () => {
   let members, github, commit, files, pullRequest;
@@ -144,6 +144,20 @@ describe('services/choose-reviewer-steps/commiters', () => {
       getCommiters(commits)
         .then(() => null)
         .then(done, done);
+    });
+
+  });
+
+  describe('#getSinceDate', function () {
+
+    it('should property format date', function () {
+      const date = +new Date(getSinceDate([2, 'days']));
+      assert.isAbove(date, +new Date() - 3 * 24 * 3600 * 1000);
+      assert.isBelow(date, +new Date() - 1 * 24 * 3600 * 1000);
+    });
+
+    it('should return an empty string if no date given', function () {
+      assert.equal(getSinceDate(), '');
     });
 
   });

@@ -17,7 +17,7 @@
     "test": "$npm_package_config_mocha --reporter spec $npm_package_config_pattern_test",
     "test:watch": "$npm_package_config_mocha --watch --reporter spec $npm_package_config_pattern_test",
     "eslint": "eslint .",
-    "coverage": "babel-node ./node_modules/.bin/isparta cover --report text --report lcovonly --report html _mocha -- -r ./core/tests/setup.js --reporter dot $npm_package_config_pattern_test",
+    "coverage": "babel-node ./node_modules/.bin/babel-istanbul cover --report text --report lcovonly --report html _mocha -- -r ./core/tests/setup.js --reporter dot $npm_package_config_pattern_test",
     "coveralls": "npm run coverage && cat ./coverage/lcov.info | coveralls && rm -rf ./coverage",
     "start": "nodemon start.js -e js,json,html --ignore node_modules/",
     "postinstall": ".scripts/postinstall.sh"
@@ -43,6 +43,7 @@
   "devDependencies": {
     "babel-cli": "^6.6.5",
     "babel-eslint": "^6.0.0",
+    "babel-istanbul": "^0.7.0",
     "chai": "^3.4.1",
     "coveralls": "^2.11.6",
     "cz-conventional-changelog": "^1.1.5",

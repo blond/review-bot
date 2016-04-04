@@ -55,7 +55,7 @@ export default function webhook(payload, imports) {
         pullRequest.html_url
       );
 
-      events.emit('github:pull_request', { pullRequest });
+      events.emit('github:pull_request:' + payload.action, { pullRequest });
 
       return pullRequest;
     });

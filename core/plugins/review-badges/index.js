@@ -91,11 +91,9 @@ export class ReviewBadgeBuilder extends BadgeBase {
    */
   build(review) {
     const status = this.buildStatusBadge(review);
-    const reviewers = review.reviewers
-      .map(::this.buildReviewerBadge)
-      .join(' ');
+    const reviewers = review.reviewers.map(::this.buildReviewerBadge);
 
-    return status + ' ' + reviewers;
+    return status + ' ' + reviewers.join(' ');
   }
 
 }
@@ -123,22 +121,21 @@ export default function (options, imports) {
   function logReviewBadgesUpdate(pullRequest) {
     logger.info(
       'Review badges updated [%s – %s] %s',
-      pullRequest.number,
-      pullRequest.title,
-      pullRequest.html_url
+      pullRequest.id, pullRequest.title, pullRequest.html_url
     );
   }
-
 
   /**
    * Call method for updating pull request body with review badges.
    *
    * @param {Object} payload
+   *
+   * @return {Promise}
    */
   function updateReviewBadges(payload) {
     const pullId = payload.pullRequest.id;
 
-    queue
+    return queue
       .dispatch('pull-request-body-update#' + pullId, () => {
         return new Promise((resolve, reject) => {
           pullRequestModel
@@ -151,7 +148,7 @@ export default function (options, imports) {
       .catch(::logger.error);
   }
 
-  // Subscribe on events for creating review badges.
+  // Subscribe to events to create review badges.
   events.on('review:started', updateReviewBadges);
   events.on('review:updated', updateReviewBadges);
   events.on('review:approved', updateReviewBadges);

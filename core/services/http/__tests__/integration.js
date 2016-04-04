@@ -11,35 +11,18 @@ describe('services/http (integration)', function () {
     options = {
       port: 3333,
       routes: {
-        '/favicon.ico': 'favicon',
         '/public': 'static',
         '/': 'index'
       }
     };
 
     const localAssets = './services/http/__tests__/assets';
-    const globalAssets = './assets';
 
     imports = {
       index: require('../routes/index').default({ assets: localAssets }, {}),
-      favicon: require('../routes/favicon').default({ assets: globalAssets }, {}),
       'static': require('../routes/static').default({ assets: localAssets }, {}),
       logger: loggerMock()
     };
-
-  });
-
-  it('should serve favicon.ico', function (done) {
-
-    service(options, imports, (app) => {
-      request(app)
-        .get('/favicon.ico')
-        .expect('Content-Type', /^image\/x-icon$/)
-        .expect(200)
-        .end(err => {
-          app.shutdown(() => done(err));
-        });
-    });
 
   });
 

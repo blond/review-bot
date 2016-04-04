@@ -47,7 +47,7 @@ describe('modules/badge-base', () => {
       assert.equal(badgeBase._escape('sta_tus'), 'sta__tus');
     });
 
-    it('should handles numbers', () => {
+    it('should handle numbers', () => {
       assert.equal(badgeBase._escape(1), '1');
     });
   });

@@ -11,7 +11,7 @@ function shouldStart(pullRequest) {
   return _.isEmpty(pullRequest.get('review.reviewers'));
 }
 
-export default function (options, imports) {
+export default function setup(options, imports) {
 
   const logger = imports.logger;
   const events = imports.events;
@@ -23,6 +23,8 @@ export default function (options, imports) {
    *
    * @param {Object} payload
    * @param {Object} payload.pullRequest
+   *
+   * @return {Promise}
    */
   function autoStart(payload) {
     const pullRequest = payload.pullRequest;
@@ -33,12 +35,10 @@ export default function (options, imports) {
 
     logger.info(
       'Autostart review [%s – %s] %s',
-      pullRequest.number,
-      pullRequest.title,
-      pullRequest.html_url
+      pullRequest.number, pullRequest.title, pullRequest.html_url
     );
 
-    chooseReviewer
+    return chooseReviewer
       .review(pullRequest.id)
       .then(resultReview => {
         return pullRequestAction.updateReviewers(resultReview.team, pullRequest.id);

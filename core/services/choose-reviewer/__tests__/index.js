@@ -91,7 +91,7 @@ describe('services/choose-reviewer', function () {
 
         const review = new ChooseReviewer(payload);
 
-        review.stepsQueue({ steps: _steps })
+        review.stepsQueue({ steps: _steps, team: [] })
           .then(() => {
             assert.deepEqual(order, ['one', 'two', 'three', 'four']);
           })
