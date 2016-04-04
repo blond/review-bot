@@ -25,6 +25,11 @@ echo -e "${color_command}[run]${color_reset} change" &&
 echo -e "${color_wait}wait${color_reset}" && echo "" &&
 sleep 3 &&
 
+echo -e "${color_command}[run]${color_reset} replace" &&
+./webhook.sh core/tests/data/issue_comment_webhook__replace.json issue_comment && echo "" &&
+echo -e "${color_wait}wait${color_reset}" && echo "" &&
+sleep 3 &&
+
 echo -e "${color_command}[run]${color_reset} start" &&
 ./webhook.sh core/tests/data/issue_comment_webhook__start.json issue_comment && echo "" &&
 echo -e "${color_wait}wait${color_reset}" && echo "" &&
