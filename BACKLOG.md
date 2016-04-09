@@ -18,7 +18,6 @@
 
 # REFACTOR
   * объеденить model action github
-  * объеденить choose-reviewer и steps
   * использовать в логах pullRequest.toString();
 
 # CHECKLIST

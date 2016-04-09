@@ -22,17 +22,12 @@ export default function commandService(options, imports) {
     const reviewers = pullRequest.get('review.reviewers');
     const commenter = find(reviewers, { login });
 
-    logger.info(
-      '"/!ok" [%s – %s] %s',
-      pullRequest.number,
-      pullRequest.title,
-      pullRequest.html_url
-    );
+    logger.info('"/!ok" %s', pullRequest.toString());
 
     if (!commenter) {
       return Promise.reject(new Error(util.format(
-        '%s tried to cancel approve, but he is not in reviewers list [%s – %s] %s',
-        login, pullRequest.number, pullRequest.title, pullRequest.html_url
+        '%s tried to cancel approve, but he is not in reviewers list %s',
+        login, pullRequest.toString()
       )));
     }
 

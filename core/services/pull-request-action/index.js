@@ -38,20 +38,15 @@ export class PullRequestAction {
 
           if (review.status !== 'notstarted') {
             throw new Error(util.format(
-              'Try to start not open review. status=%s [%s – %s] %s',
-              review.status,
-              pullRequest.id,
-              pullRequest.title,
-              pullRequest.html_url
+              'Try to start not open review. status=%s %s',
+              review.status, pullRequest.toString()
             ));
           }
 
           if (isEmpty(review.reviewers)) {
             throw new Error(util.format(
-              'Try to start review where reviewers were not selected [%s – %s] %s',
-              pullRequest.id,
-              pullRequest.title,
-              pullRequest.html_url
+              'Try to start review where reviewers were not selected %s',
+              pullRequest.toString()
             ));
           }
 
@@ -64,12 +59,7 @@ export class PullRequestAction {
         })
         .then(pullRequest => {
           this.events.emit('review:started', { pullRequest });
-          this.logger.info(
-            'Review started [%s – %s] %s',
-            pullRequest.number,
-            pullRequest.title,
-            pullRequest.html_url
-          );
+          this.logger.info('Review started %s', pullRequest.toString());
 
           return pullRequest;
         })
@@ -98,12 +88,7 @@ export class PullRequestAction {
           const review = pullRequest.get('review');
 
           if (review.status !== 'inprogress') {
-            this.logger.info(
-              'Try to stop not in progress review [%s – %s] %s',
-              pullRequest.id,
-              pullRequest.title,
-              pullRequest.html_url
-            );
+            this.logger.info('Try to stop not in progress review %s', pullRequest.toString());
           }
 
           review.status = 'notstarted';
@@ -115,12 +100,7 @@ export class PullRequestAction {
         })
         .then(pullRequest => {
           this.events.emit('review:updated', { pullRequest });
-          this.logger.info(
-            'Review stopped [%s – %s] %s',
-            pullRequest.number,
-            pullRequest.title,
-            pullRequest.html_url
-          );
+          this.logger.info('Review stopped %s', pullRequest.toString());
 
           return pullRequest;
         })
@@ -154,10 +134,8 @@ export class PullRequestAction {
 
         if (isEmpty(review.reviewers)) {
           throw new Error(util.format(
-            'Cannot drop all reviewers from pull request [%s – %s] %s',
-            pullRequest.number,
-            pullRequest.title,
-            pullRequest.html_url
+            'Cannot drop all reviewers from pull request %s',
+            pullRequest.toString()
           ));
         }
 
@@ -168,12 +146,7 @@ export class PullRequestAction {
       .then(pullRequest => {
         this.events.emit('review:updated', { pullRequest });
 
-        this.logger.info(
-          'Reviewers updated [%s – %s] %s',
-          pullRequest.number,
-          pullRequest.title,
-          pullRequest.html_url
-        );
+        this.logger.info('Reviewers updated %s', pullRequest.toString());
 
         return pullRequest;
       })
@@ -235,23 +208,12 @@ export class PullRequestAction {
       .then(pullRequest => {
 
         if (pullRequest.get('review.status') === 'complete') {
-          this.logger.info(
-            'Review complete [%s – %s] %s',
-            pullRequest.number,
-            pullRequest.title,
-            pullRequest.html_url
-          );
+          this.logger.info('Review complete %s', pullRequest.toString());
 
           this.events.emit('review:approved', { pullRequest, login });
           this.events.emit('review:complete', { pullRequest });
         } else {
-          this.logger.info(
-            'Review approved by %s [%s - %s] %s',
-            login,
-            pullRequest.number,
-            pullRequest.title,
-            pullRequest.html_url
-          );
+          this.logger.info('Review approved by %s %s', login, pullRequest.toString());
 
           this.events.emit('review:approved', { pullRequest, login });
         }

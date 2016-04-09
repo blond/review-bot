@@ -61,8 +61,7 @@ export class ChooseReviewer {
 
     if (!teamName) {
       return Promise.reject(new Error(util.format(
-        'Team not found for pull request [%s – %s] %s',
-        pullRequest.id, pullRequest.title, pullRequest.html_url
+        'Team not found for pull request %s', pullRequest.toString()
       )));
     }
 
@@ -163,12 +162,7 @@ export class ChooseReviewer {
       .then(::this.addZeroRank)
       .then(::this.stepsQueue)
       .then(review => {
-        this.logger.info(
-          'Choose reviewers complete [%s — %s] %s',
-          review.pullRequest.id,
-          review.pullRequest.title,
-          review.pullRequest.html_url
-        );
+        this.logger.info('Choose reviewers complete %s', review.pullRequest.toString());
 
         this.logger.info('Reviewers are: %s',
           (!isEmpty(review.team)) ?

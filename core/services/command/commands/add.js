@@ -27,12 +27,7 @@ export default function commandService(options, imports) {
     const pullRequest = payload.pullRequest;
     const reviewers = pullRequest.get('review.reviewers');
 
-    logger.info(
-      '"/add" [%s – %s] %s',
-      pullRequest.number,
-      pullRequest.title,
-      pullRequest.html_url
-    );
+    logger.info('"/add" %s', pullRequest.toString());
 
     const newReviewerLogin = getParticipant(command, parseLogins);
 

@@ -33,10 +33,7 @@ export default function setup(options, imports) {
       return;
     }
 
-    logger.info(
-      'Autostart review [%s – %s] %s',
-      pullRequest.number, pullRequest.title, pullRequest.html_url
-    );
+    logger.info('Autostart review %s', pullRequest.toString());
 
     return chooseReviewer
       .review(pullRequest.id)

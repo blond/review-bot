@@ -30,29 +30,19 @@ export default function commandService(options, imports) {
     const pullRequest = payload.pullRequest;
     const { oldReviewerLogin, newReviewerLogin } = getParticipant(command, parseLogins);
 
-    logger.info(
-      '"/change" [%s – %s] %s',
-      pullRequest.number,
-      pullRequest.title,
-      pullRequest.html_url
-    );
+    logger.info('"/change" %s', pullRequest.toString());
 
     if (pullRequest.state !== 'open') {
       return Promise.reject(new Error(util.format(
-        'Cannot change reviewer for closed pull request [%s – %s] %s',
-        pullRequest.number,
-        pullRequest.title,
-        pullRequest.html_url
+        'Cannot change reviewer for closed pull request %s',
+        pullRequest.toString()
       )));
     }
 
     if (!oldReviewerLogin || !newReviewerLogin) {
       return Promise.reject(new Error(util.format(
-        'Panic! Cannot parse user `change` command `%s` [%s – %s] %s',
-        command,
-        pullRequest.number,
-        pullRequest.title,
-        pullRequest.html_url
+        'Panic! Cannot parse user `change` command `%s` %s',
+        command, pullRequest.toString()
       )));
     }
 

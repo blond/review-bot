@@ -17,7 +17,7 @@ export default function webhook(payload, imports) {
   logger.info(
     'Webhook triggered: action=%s [%s – %s] %s',
     payload.action,
-    payload.pull_request.number,
+    payload.pull_request.id,
     payload.pull_request.title,
     payload.pull_request.html_url
   );
@@ -48,12 +48,7 @@ export default function webhook(payload, imports) {
       });
     })
     .then(pullRequest => {
-      logger.info(
-        'Pull request saved [%s – %s] %s',
-        pullRequest.number,
-        pullRequest.title,
-        pullRequest.html_url
-      );
+      logger.info('Pull request saved %s', pullRequest.toString());
 
       events.emit('github:pull_request:' + payload.action, { pullRequest });
 

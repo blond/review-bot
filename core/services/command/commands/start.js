@@ -17,12 +17,7 @@ export default function commandService(options, imports) {
   const startCommand = function startCommand(command, payload) {
     const pullRequest = payload.pullRequest;
 
-    logger.info(
-      '"/start" [%s – %s] %s',
-      pullRequest.number,
-      pullRequest.title,
-      pullRequest.html_url
-    );
+    logger.info('"/start" %s', pullRequest.toString());
 
     if (pullRequest.state !== 'open') {
       return Promise.reject(new Error(util.format(

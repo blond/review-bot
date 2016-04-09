@@ -119,10 +119,7 @@ export default function (options, imports) {
   }
 
   function logReviewBadgesUpdate(pullRequest) {
-    logger.info(
-      'Review badges updated [%s – %s] %s',
-      pullRequest.id, pullRequest.title, pullRequest.html_url
-    );
+    logger.info('Review badges updated %s', pullRequest.toString());
   }
 
   /**

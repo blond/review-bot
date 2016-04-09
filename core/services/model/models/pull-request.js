@@ -81,6 +81,10 @@ export function setupModel(modelName, model) {
     return id;
   });
 
+  model.methods.toString = function () {
+    return '[' + this.id + ' – ' + this.title + ']' + ' ' + this.html_url;
+  };
+
   /**
    * Find pull requests by user
    *

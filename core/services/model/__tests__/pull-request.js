@@ -22,6 +22,7 @@ describe('services/model/models/pull_request', function () {
       model = {
         set: sinon.stub().returnsThis(),
         path: sinon.stub().returnsThis(),
+        methods: {},
         statics: {}
       };
 

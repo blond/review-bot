@@ -17,19 +17,11 @@ export default function commandService(options, imports) {
   const pingCommand = function pingCommand(command, payload) {
     const pullRequest = payload.pullRequest;
 
-    logger.info(
-      '"/ping" [%s – %s]',
-      pullRequest.number,
-      pullRequest.title,
-      pullRequest.html_url
-    );
+    logger.info('"/ping" %s', pullRequest.toString());
 
     if (pullRequest.state !== 'open') {
       return Promise.reject(new Error(util.format(
-        'Cannot ping for closed pull request [%s – %s] %s',
-        pullRequest.number,
-        pullRequest.title,
-        pullRequest.html_url
+        'Cannot ping for closed pull request %s', pullRequest.toString()
       )));
     }
 

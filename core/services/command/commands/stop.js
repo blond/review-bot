@@ -17,28 +17,19 @@ export default function commandService(options, imports) {
   const stopCommand = function stopCommand(command, payload) {
     const pullRequest = payload.pullRequest;
 
-    logger.info(
-      '"/stop" [%s – %s] %s',
-      pullRequest.number,
-      pullRequest.title,
-      pullRequest.html_url
-    );
+    logger.info('"/stop" %s', pullRequest.toString());
 
     if (pullRequest.state !== 'open') {
       return Promise.reject(new Error(util.format(
-        'Cannot stop review for closed pull request [%s – %s] %s',
-        pullRequest.number,
-        pullRequest.title,
-        pullRequest.html_url
+        'Cannot stop review for closed pull request %s',
+        pullRequest.toString()
       )));
     }
 
     if (pullRequest.review.status !== 'inprogress') {
       return Promise.reject(new Error(util.format(
-        'Cannot stop not in progress review [%s – %s] %s',
-        pullRequest.number,
-        pullRequest.title,
-        pullRequest.html_url
+        'Cannot stop not in progress review %s',
+        pullRequest.toString()
       )));
     }
 
