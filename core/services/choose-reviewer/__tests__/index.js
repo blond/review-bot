@@ -7,13 +7,13 @@ import pullRequestMock from '../../model/__mocks__/pull_request';
 describe('services/choose-reviewer', function () {
 
   describe('ChooseReviewer', function () {
-    let team, model, logger, pullRequest, PullRequestModel, steps, payload;
+    let team, model, logger, pullRequest, PullRequestModel;
+    let imports, options;
 
     beforeEach(function () {
       team = teamMock();
       team.findByPullRequest.returns(Promise.resolve(membersMock()));
-
-      steps = sinon.stub();
+      team.findTeamNameByPullRequest.returns('Avengers');
 
       model = modelMock();
       logger = loggerMock();
@@ -23,13 +23,14 @@ describe('services/choose-reviewer', function () {
       PullRequestModel = model.get('pull_request');
       PullRequestModel.findById.returns(Promise.resolve(pullRequest));
 
-      payload = { team, steps, logger, 'pull-request-model': PullRequestModel };
+      options = {};
+      imports = { 'choose-team': team, logger, 'pull-request-model': PullRequestModel };
     });
 
     describe('#start', () => {
 
       it('should throws error if pull request is not found', done => {
-        const review = new ChooseReviewer(payload);
+        const review = new ChooseReviewer(options, imports);
 
         PullRequestModel.findById.returns(Promise.resolve(null));
 
@@ -47,22 +48,26 @@ describe('services/choose-reviewer', function () {
     describe('#setSteps', () => {
 
       it('should be rejected if there is no steps for team for pull request', done => {
-        const review = new ChooseReviewer(payload);
-
-        steps.returns(Promise.reject());
+        const review = new ChooseReviewer(options, imports);
 
         review.setSteps({ pullRequest: {} }).catch(() => done());
       });
 
       it('should be resolved with review which includes steps for pull request', done => {
-        const _steps = [];
-        const review = new ChooseReviewer(payload);
+        options = {
+          Avengers: {
+            steps: ['step1', 'step2']
+          }
+        };
 
-        steps.returns(Promise.resolve(_steps));
+        imports.step1 = '1';
+        imports.step2 = '2';
+
+        const review = new ChooseReviewer(options, imports);
 
         review.setSteps({ pullRequest: {} })
           .then(resolved => {
-            assert.equal(resolved.steps, _steps);
+            assert.deepEqual(resolved.steps, ['1', '2']);
             done();
           })
           .catch(done);
@@ -89,7 +94,7 @@ describe('services/choose-reviewer', function () {
           createStep('four')
         ];
 
-        const review = new ChooseReviewer(payload);
+        const review = new ChooseReviewer(options, imports);
 
         review.stepsQueue({ steps: _steps, team: [] })
           .then(() => {
@@ -110,7 +115,7 @@ describe('services/choose-reviewer', function () {
             }
           ];
 
-          const review = new ChooseReviewer(payload);
+          const review = new ChooseReviewer(options, imports);
 
           review.stepsQueue({ steps, pullRequest, team: membersMock() })
             .then(() => null)
@@ -129,7 +134,7 @@ describe('services/choose-reviewer', function () {
             }
           ];
 
-          const review = new ChooseReviewer(payload);
+          const review = new ChooseReviewer(options, imports);
 
           review.stepsQueue({ steps, pullRequest, team: membersMock() })
             .then(() => null)
@@ -143,20 +148,82 @@ describe('services/choose-reviewer', function () {
     describe('#review', () => {
 
       it('should not throw error if reviewers will not selected', done => {
-        const _steps = [
-          function (review) {
-            review.team = [];
-            return Promise.resolve(review);
+        options = {
+          Avengers: {
+            steps: ['step1']
           }
-        ];
+        };
 
-        steps.returns(Promise.resolve(_steps));
+        imports.step1 = function (review) {
+          return Promise.resolve(review);
+        };
 
-        const review = new ChooseReviewer(payload);
+        const review = new ChooseReviewer(options, imports);
 
         review.review(123456)
           .then(() => null)
           .then(done, done);
+      });
+
+    });
+
+    describe('#getSteps', function () {
+
+      let review;
+
+      beforeEach(() => {
+        options = {
+          Avengers: {
+            steps: [
+              'step1',
+              'step2'
+            ]
+          }
+        };
+
+        imports.step1 = '1';
+        imports.step2 = '2';
+
+        review = new ChooseReviewer(options, imports);
+      });
+
+      it('should be rejected if team was not found', done => {
+        team.findTeamNameByPullRequest = sinon.stub().returns(null);
+
+        review.getSteps({}).catch(() => done());
+      });
+
+      it('should be rejected if there aren`t any steps for team', done => {
+        team.findTeamNameByPullRequest = sinon.stub().returns('team');
+
+        review.getSteps({}).catch(() => done());
+      });
+
+      it('should throw an error if there is no step with passed name', done => {
+        imports.step2 = null;
+
+        review.getSteps({}).catch(() => done());
+      });
+
+      it('should instantiate steps and resolve with steps array', done => {
+        options = {
+          Avengers: {
+            steps: ['step1', 'step2']
+          }
+        };
+
+        imports.step1 = '1';
+        imports.step2 = '2';
+
+        review = new ChooseReviewer(options, imports);
+
+        review.getSteps({})
+          .then(resolved => {
+            assert.deepEqual(resolved, ['1', '2']);
+
+            done();
+          })
+          .catch(done);
       });
 
     });
@@ -173,7 +240,7 @@ describe('services/choose-reviewer', function () {
 
       requireDefault.returns(function step() {});
 
-      service(options, imports);
+      assert.property(service(options, imports), 'review');
     });
 
   });

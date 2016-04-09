@@ -1,9 +1,9 @@
 import _ from 'lodash';
 
-import { mockMembers } from '../__mocks__/index';
-import service from '../steps/load';
+import { mockMembers } from '../../__mocks__/index';
+import service from '../../steps/load';
 
-describe('services/choose-reviewer-steps/load', () => {
+describe('services/choose-reviewer/steps/load', () => {
 
   let members, pullRequest, pullRequestModel, find; // eslint-disable-line
 

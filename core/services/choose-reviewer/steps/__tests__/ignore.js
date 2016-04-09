@@ -1,9 +1,9 @@
 import _ from 'lodash';
 
-import { mockMembers } from '../__mocks__/index';
-import service from '../steps/ignore';
+import { mockMembers } from '../../__mocks__/index';
+import service from '../../steps/ignore';
 
-describe('services/choose-reviewer-steps/ignore', function () {
+describe('services/choose-reviewer/steps/ignore', function () {
 
   let members, step;
   beforeEach(() => {

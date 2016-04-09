@@ -1,9 +1,9 @@
 import _ from 'lodash';
 
-import { mockMembers } from '../__mocks__/index';
-import service from '../steps/random';
+import { mockMembers } from '../../__mocks__/index';
+import service from '../../steps/random';
 
-describe('services/choose-reviewer-steps/random', () => {
+describe('services/choose-reviewer/steps/random', () => {
 
   let members, step, pullRequest;
 

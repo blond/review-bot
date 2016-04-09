@@ -1,10 +1,9 @@
 import _ from 'lodash';
 
-import service from '../steps/commiters';
-import { mockMembers } from '../__mocks__/index';
-import { getFiles, getCommits, getCommiters, getSinceDate } from '../steps/commiters';
+import { mockMembers } from '../../__mocks__/index';
+import service, { getFiles, getCommits, getCommiters, getSinceDate } from '../../steps/commiters';
 
-describe('services/choose-reviewer-steps/commiters', () => {
+describe('services/choose-reviewer/steps/commiters', () => {
   let members, github, commit, files, pullRequest;
   let ignorePatterns = [];
 

@@ -1,29 +1,33 @@
 import _ from 'lodash';
 
-import { mockMembers } from '../__mocks__/index';
-import service from '../steps/total_number';
+import { mockMembers } from '../../__mocks__/index';
+import service from '../../steps/sort';
 
-describe('services/choose-reviewer-steps/total_number', () => {
+describe('services/choose-reviewer/steps/sort', () => {
 
   let members, step, pullRequest;
-
   beforeEach(() => {
     members = _.cloneDeep(mockMembers);
     pullRequest = {};
 
-    step = service({ max: 2 });
+    step = service();
   });
 
-  it('should keep only `option.max` members', done => {
+  it('should sort members by rank descending', done => {
     const review = { team: members, pullRequest };
-    const reviewers = [
+    const membersSorted = [
       { login: 'Black Widow', rank: 10 },
-      { login: 'Captain America', rank: 5 }
+      { login: 'Hulk', rank: 8 },
+      { login: 'Iron Man', rank: 7 },
+      { login: 'Spider-Man', rank: 6 },
+      { login: 'Captain America', rank: 5 },
+      { login: 'Hawkeye', rank: 3 },
+      { login: 'Thor', rank: 3 }
     ];
 
     step(review)
       .then(review => {
-        assert.deepEqual(review.team, reviewers);
+        assert.deepEqual(review.team, membersSorted);
         done();
       })
       .catch(done);

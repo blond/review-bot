@@ -88,17 +88,6 @@
 
     "choose-reviewer": {
       "path": "./core/services/choose-reviewer",
-      "dependencies": {
-        "team": "choose-team",
-        "logger": "logger",
-        "events": "events",
-        "steps": "choose-reviewer-steps",
-        "pull-request-model": "pull-request-model"
-      }
-    },
-
-    "choose-reviewer-steps": {
-      "path": "./core/services/choose-reviewer-steps",
       "options": {
         "team-github": {
           "steps": [
@@ -115,16 +104,18 @@
         }
       },
       "dependencies": [
+        "logger",
         "choose-team",
-        "choose-reviewer-step-remove-author",
-        "choose-reviewer-step-remove-already-reviewers",
-        "choose-reviewer-step-ignore",
+        "pull-request-model",
         "choose-reviewer-step-commiters",
-        "choose-reviewer-step-random",
+        "choose-reviewer-step-ignore",
         "choose-reviewer-step-load",
+        "choose-reviewer-step-path-related",
+        "choose-reviewer-step-random",
+        "choose-reviewer-step-remove-already-reviewers",
+        "choose-reviewer-step-remove-author",
         "choose-reviewer-step-sort",
-        "choose-reviewer-step-total-number",
-        "choose-reviewer-step-path-related"
+        "choose-reviewer-step-total-number"
       ]
     },
 

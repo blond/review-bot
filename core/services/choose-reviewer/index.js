@@ -1,17 +1,21 @@
-import { isEmpty } from 'lodash';
+import util from 'util';
+import { isEmpty, get } from 'lodash';
 
 export class ChooseReviewer {
 
   /**
    * @constructor
    *
-   * @param {Object} payload
+   * @param {Object} options
+   * @param {Object} imports
    */
-  constructor({ team, steps, logger, 'pull-request-model': pullRequestModel }) {
-    this.team = team;
-    this.steps = steps;
-    this.logger = logger;
-    this.pullRequestModel = pullRequestModel;
+  constructor(options, imports) {
+    this.imports = imports;
+    this.options = options;
+
+    this.team = imports['choose-team'];
+    this.logger = imports.logger;
+    this.pullRequestModel = imports['pull-request-model'];
   }
 
   /**
@@ -38,11 +42,53 @@ export class ChooseReviewer {
    * @return {Promise}
    */
   setSteps(review) {
-    return this.steps(review.pullRequest)
+    return this.getSteps(review.pullRequest)
       .then(steps => {
         review.steps = steps;
         return review;
       });
+  }
+
+  /**
+   * Get steps for team.
+   *
+   * @param {Object} pullRequest
+   *
+   * @return {Promise} { steps, stepOptions }
+   */
+  getSteps(pullRequest) {
+    const teamName = this.team.findTeamNameByPullRequest(pullRequest);
+
+    if (!teamName) {
+      return Promise.reject(new Error(util.format(
+        'Team not found for pull request [%s – %s] %s',
+        pullRequest.id, pullRequest.title, pullRequest.html_url
+      )));
+    }
+
+    const steps =
+      get(this.options, [teamName, 'steps']) ||
+      get(this.options, ['default', 'steps']);
+
+    if (isEmpty(steps)) {
+      return Promise.reject(new Error(util.format(
+        'There aren\'t any steps for given team — %s',
+        teamName
+      )));
+    }
+
+    return new Promise((resolve, reject) => {
+      resolve(steps.map(name => {
+        const ranker = this.imports[name];
+
+        if (!ranker) {
+          reject(new Error(util.format('There is no step with name "%s"', name)));
+        }
+
+        return ranker;
+      }));
+
+    });
   }
 
   /**
@@ -137,7 +183,7 @@ export class ChooseReviewer {
 }
 
 export default function setup(options, imports) {
-  const service = new ChooseReviewer(imports);
+  const service = new ChooseReviewer(options, imports);
 
   return service;
 }

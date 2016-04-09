@@ -1,9 +1,9 @@
 import _ from 'lodash';
 
-import { mockMembers } from '../__mocks__/index';
-import service from '../steps/remove_already_reviewers';
+import { mockMembers } from '../../__mocks__/index';
+import service from '../../steps/remove_already_reviewers';
 
-describe('services/choose-reviewer-steps/remove_already_reviewers', () => {
+describe('services/choose-reviewer/steps/remove_already_reviewers', () => {
 
   let members, step, pullRequest;
 

@@ -1,8 +1,8 @@
 import { cloneDeep, filter, forEach } from 'lodash';
-import { mockMembers } from '../__mocks__/index';
-import { isMatch, isMatchAll, getFiles, incRank, decRank } from '../steps/path-related';
+import { mockMembers } from '../../__mocks__/index';
+import { isMatch, isMatchAll, getFiles, incRank, decRank } from '../../steps/path-related';
 
-describe('services/choose-reviewer-steps/path-related', () => {
+describe('services/choose-reviewer/steps/path-related', () => {
 
   describe('#isMatch', () => {
     it('should return true if pattern match files pathes', () => {

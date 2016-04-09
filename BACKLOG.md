@@ -28,4 +28,4 @@
   * plugins/review-autoassign
   * plugins/review-badges
   * services/badge-constructor
-  * services/choose-reviewer-steps
+  * services/choose-reviewer
