@@ -184,31 +184,14 @@
 
     "#include:command": "./default-command.json",
 
-    "jabber": {
-      "path": "./core/services/jabber",
-      "options": {
-        "host": "github.com"
-      },
+    "notification": {
+      "path": "./core/services/notification",
       "dependencies": [
-        "logger"
+        "model"
       ]
     },
 
-    "review-notification": {
-      "path": "./core/services/review-notification",
-      "options": {
-        "events": {
-          "review:started": "./core/services/review-notification/templates/start",
-          "review:command:ping": "./core/services/review-notification/templates/ping",
-          "review:complete": "./core/services/review-notification/templates/complete"
-        },
-        "transport": "jabber"
-      },
-      "dependencies": [
-        "events",
-        "jabber"
-      ]
-    },
+    "#include:notification": "./default-notification.json",
 
     "#include:plugins": "./default-plugins.json"
 

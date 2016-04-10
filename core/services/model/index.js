@@ -2,6 +2,7 @@ import _ from 'lodash';
 import { Schema } from 'mongoose';
 
 import { AddonBroker } from './addon-broker';
+import * as user from './models/user';
 import * as pullRequest from './models/pull-request';
 
 export default function setup(options, imports) {
@@ -39,6 +40,7 @@ export default function setup(options, imports) {
     mongoose.model(modelName, model);
   };
 
+  setup('user', user);
   setup('pull_request', pullRequest);
 
   const service = {
