@@ -7,7 +7,7 @@ import teamMock from '../../choose-team/__mocks__/index';
 import eventsMock from '../../events/__mocks__/index';
 import loggerMock from '../../logger/__mocks__/index';
 import { mockReviewers } from '../__mocks__/index';
-import pullRequestMock from '../../model/__mocks__/pull_request';
+import pullRequestMock from '../../model/__mocks__/pull-request';
 import pullRequestActionMock from '../../pull-request-action/__mocks__/index';
 
 

@@ -3,7 +3,7 @@ import service, { ReviewBadgeBuilder } from '../../review-badges';
 import queueMock from '../../../services/queue/__mocks__/index';
 import eventsMock from '../../../services/events/__mocks__/index';
 import loggerMock from '../../../services/logger/__mocks__/index';
-import pullRequestMock from '../../../services/model/__mocks__/pull_request';
+import pullRequestMock from '../../../services/model/__mocks__/pull-request';
 import pullRequestGitHubMock from '../../../services/pull-request-github/__mocks__/index';
 import { pullRequestModelMock } from '../../../services/model/__mocks__/index';
 

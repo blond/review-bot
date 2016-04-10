@@ -2,7 +2,7 @@ import webhook from '../../webhooks/issue_comment';
 import modelMock from '../../../model/__mocks__/index';
 import loggerMock from '../../../logger/__mocks__/index';
 import eventsMock from '../../../events/__mocks__/index';
-import pullRequestMock from '../../../model/__mocks__/pull_request';
+import pullRequestMock from '../../../model/__mocks__/pull-request';
 
 describe('services/pull-request-github/webhooks/issue_comment', () => {
 

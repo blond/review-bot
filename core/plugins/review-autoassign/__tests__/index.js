@@ -1,7 +1,7 @@
 import service from '../../review-autoassign';
 import eventsMock from '../../../services/events/__mocks__/index';
 import loggerMock from '../../../services/logger/__mocks__/index';
-import pullRequestMock from '../../../services/model/__mocks__/pull_request';
+import pullRequestMock from '../../../services/model/__mocks__/pull-request';
 import pullRequestActionMock from '../../../services/pull-request-action/__mocks__/index';
 import chooseReviewerMock from '../../../services/choose-reviewer/__mocks__/index';
 

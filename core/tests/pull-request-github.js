@@ -1,5 +1,5 @@
 import { withApp } from './common';
-import pullRequestMock from '../services/pull-request-github/__mocks__/pull_request';
+import pullRequestMock from '../services/pull-request-github/__mocks__/pull-request';
 
 function withAppAndPullRequest(test, done) {
   withApp(imports => {

@@ -1,4 +1,4 @@
-import pullRequestMock from './pull_request';
+import pullRequestMock from './pull-request';
 
 export function pullRequestModelMock() {
 

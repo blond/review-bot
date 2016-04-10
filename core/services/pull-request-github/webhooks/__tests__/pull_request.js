@@ -1,6 +1,6 @@
 import webhook from '../../webhooks/pull_request';
 import modelMock from '../../../model/__mocks__/index';
-import pullRequestMock from '../../../model/__mocks__/pull_request';
+import pullRequestMock from '../../../model/__mocks__/pull-request';
 import loggerMock from '../../../logger/__mocks__/index';
 import eventsMock from '../../../events/__mocks__/index';
 import githubMock from '../../../pull-request-github/__mocks__/index';

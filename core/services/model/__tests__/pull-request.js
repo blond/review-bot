@@ -1,6 +1,6 @@
 import * as pullRequest from '../../model/models/pull-request';
 
-describe('services/model/models/pull_request', function () {
+describe('services/model/models/pull-request', function () {
 
   describe('#setupSchema', function () {
 
