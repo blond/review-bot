@@ -25,6 +25,11 @@
       "handlers": ["command-busy"]
     },
     {
+      "test": "\/replace",
+      "handlers": ["command-replace"]
+    },
+
+    {
       "test": "\/add|\\+@?[a-z]\\w+",
       "handlers": ["command-add"]
     },

@@ -176,6 +176,7 @@
         "command-ok",
         "command-not-ok",
         "command-busy",
+        "command-replace",
         "command-change",
         "command-add",
         "command-remove"

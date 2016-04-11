@@ -38,6 +38,18 @@
     }
   },
 
+  "command-replace": {
+    "path": "./core/services/command/commands/replace",
+    "dependencies": {
+      "team": "choose-team",
+      "review": "choose-reviewer",
+      "action": "pull-request-action",
+      "logger": "logger",
+      "events": "events",
+      "parseLogins": "parse-logins"
+    }
+  },
+
   "command-change": {
     "path": "./core/services/command/commands/change",
     "dependencies": {
