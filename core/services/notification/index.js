@@ -14,9 +14,9 @@ export default function setup(options, imports) {
     return 'notification-service-' + transport.id;
   }
 
-  return function send(login, message) {
+  return function send(to, message) {
     const userTransports = userModel
-      .findByLogin(login)
+      .findByLogin(to)
       .getNotificationTransport();
 
     for (let i = 0; i < userTransports.length; i++) {

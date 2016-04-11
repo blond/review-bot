@@ -7,7 +7,16 @@ export default function setup(options, imports) {
     logger.info('Jabber: ' + message);
   };
 
-  const service = new Jabber(options);
+  const jabber = new Jabber(options);
+  // Ignore promise and don't wait until client goes online.
+  jabber.connect();
+
+  const service = function send(to, message) {
+    return new Promise(resolve => {
+      jabber.send(to, message);
+      resolve();
+    });
+  };
 
   service.shutdown = function () {
     return new Promise(resolve => {
@@ -15,9 +24,6 @@ export default function setup(options, imports) {
       resolve();
     });
   };
-
-  // Ignore promise and don't wait until client goes online.
-  service.connect();
 
   return service;
 }
