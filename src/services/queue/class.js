@@ -1,9 +1,23 @@
+// @flow
+
 import { isEmpty } from 'lodash';
 
 /**
  * Queue that starts tasks in order.
  */
 export default class Queue {
+
+  queue: {
+    [id: string]: {
+      queue: Array<{
+        id: string,
+        reject: (err: Error) => void,
+        resolve: () => void,
+        callback: () => void
+      }>,
+      active: boolean
+    }
+  };
 
   /**
    * @constructor
@@ -21,7 +35,7 @@ export default class Queue {
    *
    * @protected
    */
-  step(id) {
+  step(id: string) {
     if (!this.queue[id] || this.queue[id].active) {
       return;
     }
@@ -61,7 +75,7 @@ export default class Queue {
    *
    * @return {Promise}
    */
-  enqueue(id, callback) {
+  enqueue(id: string, callback: () => void) {
     return new Promise((resolve, reject) => {
       this.queue[id] = this.queue[id] || { active: false, queue: [] };
       this.queue[id].queue.push({ id, callback, resolve, reject });
@@ -76,7 +90,7 @@ export default class Queue {
    *
    * @return {Promise} when the task will completed.
    */
-  dispatch(id, callback) {
+  dispatch(id: string, callback: () => void) {
     const promise = this.enqueue(id, callback);
 
     this.step(id);

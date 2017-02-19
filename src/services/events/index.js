@@ -1,11 +1,15 @@
+// @flow
+
 import { EventEmitter2 } from 'eventemitter2';
+
+import type EventEmitter from 'events';
 
 /**
  * Creates "EventEmitter" service.
  *
  * @return {EventEmitter}
  */
-export default function setup() {
+export default function setup(): EventEmitter {
 
   return new EventEmitter2();
 

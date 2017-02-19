@@ -1,11 +1,13 @@
+// @flow
+
 import Queue from './class';
 
 /**
- * Creates "Queue" service.
+ * Creates "queue" service.
  *
  * @return {Queue}
  */
-export default function setup() {
+export default function setup(): Queue {
 
   return new Queue();
 
